@@ -1,7 +1,8 @@
-﻿.landing-page {
+.landing-page {
   min-height: 100vh;
   padding: 1.1rem;
   display: grid;
+  align-content: start;
   gap: 1.2rem;
   background:
     radial-gradient(58% 52% at 12% 8%, color-mix(in srgb, var(--brand-500) 20%, transparent), transparent 65%),
