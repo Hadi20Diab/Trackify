@@ -23,6 +23,10 @@
   --shadow-sm: 0 8px 20px rgba(22, 46, 88, 0.08);
   --shadow-md: 0 14px 28px rgba(20, 43, 85, 0.12);
   --shadow-lg: 0 20px 36px rgba(18, 39, 76, 0.16);
+
+  /* Material fallbacks to avoid unresolved outlined-button variables. */
+  --mat-button-outlined-label-text-color: var(--brand-700);
+  --mat-button-outlined-outline-color: color-mix(in srgb, var(--brand-500) 38%, var(--surface-border));
 }
 
 body.theme-dark {
@@ -46,6 +50,9 @@ body.theme-dark {
   --shadow-sm: 0 8px 20px rgba(3, 6, 15, 0.32);
   --shadow-md: 0 14px 30px rgba(2, 5, 14, 0.42);
   --shadow-lg: 0 20px 42px rgba(0, 2, 10, 0.55);
+
+  --mat-button-outlined-label-text-color: #bfd4ff;
+  --mat-button-outlined-outline-color: color-mix(in srgb, var(--brand-500) 52%, var(--surface-border));
 }
 
 * {
@@ -123,4 +130,10 @@ mat-progress-bar {
 
 .mat-mdc-snack-bar-container .mat-mdc-button {
   color: inherit !important;
+}
+
+.mat-mdc-outlined-button,
+.mat-mdc-outlined-button:not(:disabled) {
+  --mat-button-outlined-label-text-color: var(--mat-button-outlined-label-text-color, var(--brand-700));
+  --mat-button-outlined-outline-color: var(--mat-button-outlined-outline-color, var(--surface-border));
 }
