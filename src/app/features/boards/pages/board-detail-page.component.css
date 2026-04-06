@@ -189,9 +189,11 @@
   border: 1px solid var(--surface-border);
   background: var(--surface-panel);
   min-height: 420px;
+  max-height: min(72vh, 760px);
   display: grid;
   grid-template-rows: auto 1fr;
   box-shadow: var(--shadow-sm);
+  overflow: hidden;
 }
 
 .column__header {
@@ -201,6 +203,10 @@
   justify-content: space-between;
   gap: 0.4rem;
   cursor: grab;
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  background: var(--surface-panel);
 }
 
 .column__header h3 {
@@ -226,6 +232,8 @@
   display: grid;
   gap: 0.72rem;
   align-content: start;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .column__empty {
@@ -319,6 +327,10 @@
 
   .board-columns {
     grid-auto-columns: minmax(260px, 88vw);
+  }
+
+  .column {
+    max-height: min(68vh, 720px);
   }
 }
 

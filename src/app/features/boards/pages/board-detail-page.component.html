@@ -182,7 +182,7 @@
     @if (columnViewModels$ | async; as columnViews) {
       <div class="board-columns" cdkDropList cdkDropListOrientation="horizontal" [cdkDropListData]="columnViews" (cdkDropListDropped)="onColumnDrop($event)">
         @for (view of columnViews; track trackByColumn($index, view)) {
-          <article class="column" cdkDrag (contextmenu)="openColumnContextMenu($event, view.column, columnContextTrigger)">
+          <article class="column" cdkDrag (contextmenu)="openColumnContextMenu($event, view.column)">
             <header class="column__header" cdkDragHandle>
               <div>
                 <h3>{{ view.column.title }}</h3>
@@ -248,7 +248,7 @@
                         cdkDrag
                         [cdkDragData]="task"
                         [cdkDragDisabled]="!(canDragTasks$ | async)"
-                        (contextmenu)="openTaskContextMenu($event, task, taskContextTrigger)"
+                        (contextmenu)="openTaskContextMenu($event, task)"
                       >
                         <app-task-card [task]="task" (edit)="editTask($event)" (delete)="deleteTask($event)"></app-task-card>
                       </div>

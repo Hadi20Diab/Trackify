@@ -1,13 +1,13 @@
 ﻿<div class="app-shell" [class.app-shell--collapsed]="isSidebarCollapsed()">
   <aside class="sidebar" [class.sidebar--collapsed]="isSidebarCollapsed()">
     <section class="brand">
-      <div class="brand__identity">
+      <a class="brand__identity" routerLink="/" aria-label="Go to home">
         <div class="brand__glyph">T</div>
         <div class="brand__copy">
           <h1>Trackify</h1>
           <p>Task Management Hub</p>
         </div>
-      </div>
+      </a>
 
       <button
         mat-icon-button
@@ -24,19 +24,20 @@
       <a
         mat-stroked-button
         class="nav-btn"
-        routerLink="/"
-        [routerLinkActiveOptions]="{ exact: true }"
+        routerLink="/boards"
         routerLinkActive="nav-btn--active"
-        [matTooltip]="isSidebarCollapsed() ? 'Home' : ''"
+        [matTooltip]="isSidebarCollapsed() ? 'Boards' : ''"
       >
-        <mat-icon>home</mat-icon>
-        <span>Home</span>
-      </a>
-      <a mat-stroked-button class="nav-btn" routerLink="/boards" routerLinkActive="nav-btn--active" [matTooltip]="isSidebarCollapsed() ? 'Boards' : ''">
         <mat-icon>view_kanban</mat-icon>
         <span>Boards</span>
       </a>
-      <a mat-stroked-button class="nav-btn" routerLink="/board" routerLinkActive="nav-btn--active" [matTooltip]="isSidebarCollapsed() ? 'Open Workspace' : ''">
+      <a
+        mat-stroked-button
+        class="nav-btn"
+        routerLink="/board"
+        routerLinkActive="nav-btn--active"
+        [matTooltip]="isSidebarCollapsed() ? 'Open Workspace' : ''"
+      >
         <mat-icon>insights</mat-icon>
         <span>Open Workspace</span>
       </a>

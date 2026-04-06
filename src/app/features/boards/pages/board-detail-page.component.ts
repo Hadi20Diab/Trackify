@@ -1,6 +1,14 @@
 ﻿import { AsyncPipe, DatePipe, TitleCasePipe } from '@angular/common';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  ViewChild,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -115,6 +123,9 @@ export class BoardDetailPageComponent implements OnInit {
   readonly contextMenuPosition = signal({ x: '0px', y: '0px' });
   readonly contextColumn = signal<BoardColumn | null>(null);
   readonly contextTask = signal<TaskItem | null>(null);
+
+  @ViewChild('columnContextTrigger') private columnContextTrigger?: MatMenuTrigger;
+  @ViewChild('taskContextTrigger') private taskContextTrigger?: MatMenuTrigger;
 
   readonly groupingModes: SwimlaneMode[] = ['none', 'priority', 'dueDate', 'custom'];
   readonly priorities: Array<TaskPriority | 'all'> = ['all', 'high', 'medium', 'low'];
@@ -636,26 +647,32 @@ export class BoardDetailPageComponent implements OnInit {
       });
   }
 
-  openColumnContextMenu(event: MouseEvent, column: BoardColumn, trigger: MatMenuTrigger): void {
+  openColumnContextMenu(event: MouseEvent, column: BoardColumn): void {
     event.preventDefault();
+    event.stopPropagation();
+    this.taskContextTrigger?.closeMenu();
+    this.contextTask.set(null);
     this.contextColumn.set(column);
     this.contextMenuPosition.set({
       x: `${event.clientX}px`,
       y: `${event.clientY}px`,
     });
-    trigger.closeMenu();
-    trigger.openMenu();
+    this.columnContextTrigger?.closeMenu();
+    this.columnContextTrigger?.openMenu();
   }
 
-  openTaskContextMenu(event: MouseEvent, task: TaskItem, trigger: MatMenuTrigger): void {
+  openTaskContextMenu(event: MouseEvent, task: TaskItem): void {
     event.preventDefault();
+    event.stopPropagation();
+    this.columnContextTrigger?.closeMenu();
+    this.contextColumn.set(null);
     this.contextTask.set(task);
     this.contextMenuPosition.set({
       x: `${event.clientX}px`,
       y: `${event.clientY}px`,
     });
-    trigger.closeMenu();
-    trigger.openMenu();
+    this.taskContextTrigger?.closeMenu();
+    this.taskContextTrigger?.openMenu();
   }
 
   onColumnDrop(event: CdkDragDrop<ColumnViewModel[]>): void {

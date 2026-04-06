@@ -2,6 +2,7 @@
 @import '@angular/material/prebuilt-themes/azure-blue.css';
 
 :root {
+  --font-family-base: 'Manrope', 'Cairo', 'Segoe UI', sans-serif;
   --brand-500: #2a63f6;
   --brand-700: #1d46b6;
   --accent-cyan: #1cc2d4;
@@ -58,12 +59,27 @@ body {
 }
 
 body {
-  font-family: 'Manrope', 'Cairo', sans-serif;
+  font-family: var(--font-family-base);
   color: var(--text-primary);
   background:
     radial-gradient(66% 45% at 100% 0%, color-mix(in srgb, var(--brand-500) 12%, transparent), transparent 58%),
     radial-gradient(52% 35% at 0% 100%, color-mix(in srgb, var(--accent-cyan) 11%, transparent), transparent 62%),
     var(--page-background);
+}
+
+button,
+input,
+textarea,
+select,
+a,
+.mat-mdc-button-base,
+.mat-mdc-menu-item,
+.mat-mdc-option,
+.mat-mdc-dialog-title,
+.mat-mdc-dialog-content,
+.mdc-text-field__input,
+.mdc-list-item__primary-text {
+  font-family: var(--font-family-base) !important;
 }
 
 ::-webkit-scrollbar {
