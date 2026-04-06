@@ -67,7 +67,6 @@ import {
 interface FilterFormValue {
   search: string;
   priority: TaskPriority | 'all';
-  columnId: string | 'all';
   swimlane: SwimlaneMode;
 }
 
@@ -133,7 +132,6 @@ export class BoardDetailPageComponent implements OnInit {
   readonly filterForm = this.fb.nonNullable.group({
     search: '',
     priority: 'all' as TaskPriority | 'all',
-    columnId: 'all' as string | 'all',
     swimlane: 'none' as SwimlaneMode,
   });
 
@@ -150,7 +148,6 @@ export class BoardDetailPageComponent implements OnInit {
     map((value): FilterFormValue => ({
       search: value.search ?? '',
       priority: value.priority ?? 'all',
-      columnId: value.columnId ?? 'all',
       swimlane: value.swimlane ?? 'none',
     })),
     shareReplay({ bufferSize: 1, refCount: true }),
@@ -200,7 +197,6 @@ export class BoardDetailPageComponent implements OnInit {
       (filters) =>
         filters.search.trim().length > 0 ||
         filters.priority !== 'all' ||
-        filters.columnId !== 'all' ||
         filters.swimlane !== 'none',
     ),
   );
@@ -210,7 +206,6 @@ export class BoardDetailPageComponent implements OnInit {
       (filters) =>
         filters.search.trim().length === 0 &&
         filters.priority === 'all' &&
-        filters.columnId === 'all' &&
         filters.swimlane === 'none',
     ),
   );
@@ -714,7 +709,6 @@ export class BoardDetailPageComponent implements OnInit {
     this.filterForm.patchValue({
       search: '',
       priority: 'all',
-      columnId: 'all',
       swimlane: 'none',
     });
   }
@@ -774,9 +768,8 @@ export class BoardDetailPageComponent implements OnInit {
       const matchesSearch =
         normalizedSearch.length === 0 || task.title.toLowerCase().includes(normalizedSearch);
       const matchesPriority = filters.priority === 'all' || task.priority === filters.priority;
-      const matchesColumn = filters.columnId === 'all' || task.columnId === filters.columnId;
 
-      return matchesSearch && matchesPriority && matchesColumn;
+      return matchesSearch && matchesPriority;
     });
 
     return columns.map((column) => {

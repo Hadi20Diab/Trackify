@@ -98,16 +98,6 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="filter-item">
-        <mat-label>Column</mat-label>
-        <mat-select formControlName="columnId">
-          <mat-option value="all">All columns</mat-option>
-          @for (column of columns$ | async; track column.id) {
-            <mat-option [value]="column.id">{{ column.title }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="filter-item">
         <mat-label>Swimlanes</mat-label>
         <mat-select formControlName="swimlane">
           @for (mode of groupingModes; track mode) {

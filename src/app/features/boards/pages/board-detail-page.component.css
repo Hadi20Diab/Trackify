@@ -78,7 +78,7 @@
   box-shadow: var(--shadow-sm);
   padding: 1rem;
   display: grid;
-  grid-template-columns: minmax(220px, 1.4fr) repeat(3, minmax(170px, 1fr)) auto;
+  grid-template-columns: minmax(220px, 1.4fr) repeat(2, minmax(170px, 1fr)) auto;
   gap: 0.45rem;
   align-items: center;
 }
