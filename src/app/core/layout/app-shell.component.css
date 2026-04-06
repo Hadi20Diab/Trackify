@@ -131,7 +131,6 @@
   place-items: center;
   font-size: 0.7rem;
   font-weight: 700;
-  color: var(--brand-700);
   background: color-mix(in srgb, var(--brand-500) 18%, transparent);
 }
 
