@@ -27,6 +27,7 @@
   /* Material fallbacks to avoid unresolved outlined-button variables. */
   --mat-button-outlined-label-text-color: var(--brand-700);
   --mat-button-outlined-outline-color: color-mix(in srgb, var(--brand-500) 38%, var(--surface-border));
+  --mat-button-text-label-text-color: var(--brand-700);
   --mat-button-filled-touch-target-size: 48px;
   --mat-button-outlined-touch-target-size: 48px;
   --mat-button-protected-touch-target-size: 48px;
@@ -73,6 +74,7 @@ body.theme-dark {
 
   --mat-button-outlined-label-text-color: #bfd4ff;
   --mat-button-outlined-outline-color: color-mix(in srgb, var(--brand-500) 52%, var(--surface-border));
+  --mat-button-text-label-text-color: #bfd4ff;
   --mat-icon-button-state-layer-size: 40px;
   --mat-icon-button-icon-size: 24px;
   --mat-icon-button-icon-color: #bed1f0;
