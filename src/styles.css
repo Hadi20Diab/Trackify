@@ -39,6 +39,10 @@
   --mat-button-outlined-touch-target-display: block;
   --mat-icon-button-touch-target-size: 48px;
   --mat-icon-button-touch-target-display: block;
+  --mat-icon-button-state-layer-size: 40px;
+  --mat-icon-button-icon-size: 24px;
+  --mat-icon-button-icon-color: var(--text-secondary);
+  --mat-sys-on-surface-variant: #44474e;
   --mat-fab-touch-target-size: 48px;
   --mat-fab-small-touch-target-size: 48px;
   --mat-fab-touch-target-display: block;
@@ -69,6 +73,10 @@ body.theme-dark {
 
   --mat-button-outlined-label-text-color: #bfd4ff;
   --mat-button-outlined-outline-color: color-mix(in srgb, var(--brand-500) 52%, var(--surface-border));
+  --mat-icon-button-state-layer-size: 40px;
+  --mat-icon-button-icon-size: 24px;
+  --mat-icon-button-icon-color: #bed1f0;
+  --mat-sys-on-surface-variant: #8fa8d0;
 }
 
 * {
