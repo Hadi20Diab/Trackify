@@ -71,6 +71,8 @@
   --mat-dialog-subhead-tracking: var(--mat-sys-headline-small-tracking);
   --mat-dialog-with-actions-content-padding: 20px 24px 0;
   --mat-dialog-actions-padding: 16px 24px;
+  --mat-dialog-actions-alignment: flex-end;
+  --mat-dialog-container-color: var(--surface-card);
   --mat-dialog-supporting-text-color: var(--text-secondary);
   --mat-dialog-supporting-text-font: var(--mat-sys-body-medium-font);
   --mat-dialog-supporting-text-line-height: var(--mat-sys-body-medium-line-height);
@@ -146,6 +148,7 @@ body.theme-dark {
   --mat-button-outlined-label-text-color: #bfd4ff;
   --mat-button-outlined-outline-color: color-mix(in srgb, var(--brand-500) 52%, var(--surface-border));
   --mat-button-text-label-text-color: #bfd4ff;
+  --mat-dialog-container-color: var(--surface-panel);
   --mat-dialog-subhead-color: var(--text-primary);
   --mat-dialog-supporting-text-color: var(--text-secondary);
   --mat-menu-item-label-text-color: var(--text-primary);
