@@ -9,6 +9,10 @@
     </section>
 
     <section class="sidebar__quick-actions">
+      <a mat-stroked-button class="nav-btn" routerLink="/" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="nav-btn--active">
+        <mat-icon>home</mat-icon>
+        Home
+      </a>
       <a mat-stroked-button class="nav-btn" routerLink="/boards" routerLinkActive="nav-btn--active">
         <mat-icon>view_kanban</mat-icon>
         Boards

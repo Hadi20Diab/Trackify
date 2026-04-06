@@ -4,13 +4,16 @@ import { AppShellComponent } from './core/layout/app-shell.component';
 export const routes: Routes = [
   {
     path: '',
+    pathMatch: 'full',
+    loadComponent: () =>
+      import('./features/landing/pages/landing-page.component').then(
+        (module) => module.LandingPageComponent,
+      ),
+  },
+  {
+    path: '',
     component: AppShellComponent,
     children: [
-      {
-        path: '',
-        pathMatch: 'full',
-        redirectTo: 'boards',
-      },
       {
         path: 'boards',
         loadComponent: () =>
