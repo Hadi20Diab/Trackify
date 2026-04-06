@@ -1,4 +1,4 @@
-﻿.public-header {
+.public-header {
   max-width: 1240px;
   margin: 0 auto;
   display: flex;
@@ -47,12 +47,35 @@
 }
 
 .public-nav__link--active {
+  color: var(--brand-700);
   background: color-mix(in srgb, var(--brand-500) 16%, transparent);
+}
+
+.public-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.public-theme-toggle {
+  border: 1px solid var(--surface-border);
+  background: var(--surface-card);
+  color: var(--text-secondary);
+  border-radius: 12px;
+}
+
+.public-theme-toggle:hover {
+  background: color-mix(in srgb, var(--brand-500) 9%, var(--surface-card));
 }
 
 @media (max-width: 920px) {
   .public-header {
     flex-wrap: wrap;
+  }
+
+  .public-actions {
+    margin-left: auto;
+    order: 2;
   }
 
   .public-nav {
