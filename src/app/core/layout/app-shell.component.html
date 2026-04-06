@@ -29,7 +29,7 @@
         [matTooltip]="isSidebarCollapsed() ? 'Boards' : ''"
       >
         <mat-icon>view_kanban</mat-icon>
-        <span>Boards</span>
+        <span class="nav-btn__label">Boards</span>
       </a>
       <a
         mat-stroked-button
@@ -39,7 +39,7 @@
         [matTooltip]="isSidebarCollapsed() ? 'Open Workspace' : ''"
       >
         <mat-icon>insights</mat-icon>
-        <span>Open Workspace</span>
+        <span class="nav-btn__label">Open Workspace</span>
       </a>
     </section>
 
@@ -78,7 +78,7 @@
         [matTooltip]="(isDarkMode$ | async) ? 'Switch to light mode' : 'Switch to dark mode'"
       >
         <mat-icon>{{ (isDarkMode$ | async) ? 'light_mode' : 'dark_mode' }}</mat-icon>
-        <span>{{ (isDarkMode$ | async) ? 'Light Mode' : 'Dark Mode' }}</span>
+        <span class="theme-btn__label">{{ (isDarkMode$ | async) ? 'Light Mode' : 'Dark Mode' }}</span>
       </button>
     </section>
   </aside>

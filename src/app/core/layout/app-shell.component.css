@@ -93,7 +93,7 @@
   font-weight: 700;
 }
 
-.nav-btn span {
+.nav-btn__label {
   transition: opacity 180ms ease;
 }
 
@@ -199,7 +199,7 @@
   background: var(--surface-card);
 }
 
-.sidebar__theme span {
+.theme-btn__label {
   transition: opacity 180ms ease;
 }
 
@@ -222,8 +222,8 @@
 }
 
 .app-shell--collapsed .brand__copy,
-.app-shell--collapsed .nav-btn span,
-.app-shell--collapsed .sidebar__theme span {
+.app-shell--collapsed .nav-btn__label,
+.app-shell--collapsed .theme-btn__label {
   opacity: 0;
   width: 0;
   pointer-events: none;
