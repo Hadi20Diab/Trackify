@@ -228,6 +228,7 @@
   width: 0;
   pointer-events: none;
   overflow: hidden;
+  display: none;
 }
 
 .app-shell--collapsed .sidebar__boards {
