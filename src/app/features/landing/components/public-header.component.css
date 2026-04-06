@@ -47,7 +47,6 @@
 }
 
 .public-nav__link--active {
-  color: var(--brand-700) !important;
   background: color-mix(in srgb, var(--brand-500) 16%, transparent);
 }
 
