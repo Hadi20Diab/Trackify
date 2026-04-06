@@ -16,6 +16,8 @@
   --text-primary: #11233f;
   --text-secondary: #3d577d;
   --text-tertiary: #6780a2;
+  --mat-sys-on-surface: #1a1b1f;
+  --mat-sys-focus-state-layer-opacity: 0.12;
 
   --warning: #f2ad36;
   --warning-text: #7b530c;
@@ -44,8 +46,23 @@
   --mat-menu-item-trailing-spacing: 12px;
   --mat-menu-item-with-icon-leading-spacing: 12px;
   --mat-menu-item-with-icon-trailing-spacing: 12px;
+  --mat-sys-label-large-font: var(--font-family-base);
+  --mat-sys-label-large-line-height: 1.25rem;
+  --mat-sys-label-large-size: 0.875rem;
+  --mat-sys-label-large-tracking: 0.006rem;
+  --mat-sys-label-large-weight: 600;
+  --mat-menu-item-label-text-font: var(--mat-sys-label-large-font);
+  --mat-menu-item-label-text-line-height: var(--mat-sys-label-large-line-height);
+  --mat-menu-item-label-text-size: var(--mat-sys-label-large-size);
+  --mat-menu-item-label-text-tracking: var(--mat-sys-label-large-tracking);
+  --mat-menu-item-label-text-weight: var(--mat-sys-label-large-weight);
   --mat-menu-item-label-text-color: var(--text-primary);
   --mat-menu-item-icon-color: var(--text-tertiary);
+  --mat-menu-item-focus-state-layer-color: color-mix(
+    in srgb,
+    var(--mat-sys-on-surface) calc(var(--mat-sys-focus-state-layer-opacity) * 100%),
+    transparent
+  );
   --mat-sys-body-large-font: var(--font-family-base);
   --mat-sys-body-large-line-height: 1.5rem;
   --mat-sys-body-large-size: 1rem;
@@ -82,6 +99,8 @@ body.theme-dark {
   --text-primary: #edf3ff;
   --text-secondary: #bed1f0;
   --text-tertiary: #8fa8d0;
+  --mat-sys-on-surface: #edf3ff;
+  --mat-sys-focus-state-layer-opacity: 0.14;
 
   --warning: #ffbf55;
   --warning-text: #3f2b06;
