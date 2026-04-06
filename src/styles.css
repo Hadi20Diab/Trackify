@@ -46,6 +46,16 @@
   --mat-menu-item-with-icon-trailing-spacing: 12px;
   --mat-menu-item-label-text-color: var(--text-primary);
   --mat-menu-item-icon-color: var(--text-tertiary);
+  --mat-sys-body-large-font: var(--font-family-base);
+  --mat-sys-body-large-line-height: 1.5rem;
+  --mat-sys-body-large-size: 1rem;
+  --mat-sys-body-large-tracking: 0.031rem;
+  --mat-sys-body-large-weight: 500;
+  --mat-form-field-container-text-font: var(--mat-sys-body-large-font);
+  --mat-form-field-container-text-line-height: var(--mat-sys-body-large-line-height);
+  --mat-form-field-container-text-size: var(--mat-sys-body-large-size);
+  --mat-form-field-container-text-tracking: var(--mat-sys-body-large-tracking);
+  --mat-form-field-container-text-weight: var(--mat-sys-body-large-weight);
   --mat-icon-button-touch-target-size: 48px;
   --mat-icon-button-touch-target-display: block;
   --mat-icon-button-state-layer-size: 40px;
