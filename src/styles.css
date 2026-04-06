@@ -38,6 +38,14 @@
   --mat-button-text-touch-target-display: block;
   --mat-button-tonal-touch-target-display: block;
   --mat-button-outlined-touch-target-display: block;
+  --mat-menu-item-spacing: 12px;
+  --mat-menu-item-icon-size: 24px;
+  --mat-menu-item-leading-spacing: 12px;
+  --mat-menu-item-trailing-spacing: 12px;
+  --mat-menu-item-with-icon-leading-spacing: 12px;
+  --mat-menu-item-with-icon-trailing-spacing: 12px;
+  --mat-menu-item-label-text-color: var(--text-primary);
+  --mat-menu-item-icon-color: var(--text-tertiary);
   --mat-icon-button-touch-target-size: 48px;
   --mat-icon-button-touch-target-display: block;
   --mat-icon-button-state-layer-size: 40px;
@@ -75,6 +83,8 @@ body.theme-dark {
   --mat-button-outlined-label-text-color: #bfd4ff;
   --mat-button-outlined-outline-color: color-mix(in srgb, var(--brand-500) 52%, var(--surface-border));
   --mat-button-text-label-text-color: #bfd4ff;
+  --mat-menu-item-label-text-color: var(--text-primary);
+  --mat-menu-item-icon-color: var(--text-secondary);
   --mat-icon-button-state-layer-size: 40px;
   --mat-icon-button-icon-size: 24px;
   --mat-icon-button-icon-color: #bed1f0;
