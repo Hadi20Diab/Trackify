@@ -57,6 +57,9 @@ export class BoardsPageComponent implements OnInit {
     const dialogRef = this.dialog.open(BoardFormDialogComponent, {
       width: '560px',
       autoFocus: false,
+      data: {
+        mode: 'create',
+      },
     });
 
     dialogRef
@@ -115,6 +118,41 @@ export class BoardsPageComponent implements OnInit {
       .subscribe({
         next: () => this.notification.info('Board deleted.'),
         error: () => this.notification.warn('Failed to delete board.'),
+      });
+  }
+
+  editBoard(board: Board): void {
+    const dialogRef = this.dialog.open(BoardFormDialogComponent, {
+      width: '560px',
+      autoFocus: false,
+      data: {
+        mode: 'edit',
+        title: board.title,
+        description: board.description,
+      },
+    });
+
+    dialogRef
+      .afterClosed()
+      .pipe(
+        switchMap((result: BoardFormDialogResult | undefined) => {
+          if (!result) {
+            return EMPTY;
+          }
+
+          return this.boardService.updateBoard(board.id, result);
+        }),
+      )
+      .subscribe({
+        next: (updatedBoard) => {
+          if (!updatedBoard) {
+            this.notification.warn('Board not found.');
+            return;
+          }
+
+          this.notification.success('Board details updated.');
+        },
+        error: () => this.notification.warn('Failed to update board.'),
       });
   }
 

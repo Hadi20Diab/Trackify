@@ -44,6 +44,11 @@ import {
   TaskFormDialogResult,
 } from '../../tasks/components/task-form-dialog.component';
 import { TaskCardComponent } from '../../tasks/components/task-card.component';
+import { Board } from '../../../models/board.model';
+import {
+  BoardFormDialogComponent,
+  BoardFormDialogResult,
+} from '../components/board-form-dialog.component';
 
 interface FilterFormValue {
   search: string;
@@ -279,6 +284,47 @@ export class BoardDetailPageComponent implements OnInit {
         error: () => {
           this.isMutating.set(false);
           this.notification.warn('Failed to create task.');
+        },
+      });
+  }
+
+  editBoardDetails(board: Board): void {
+    const dialogRef = this.dialog.open(BoardFormDialogComponent, {
+      width: '560px',
+      autoFocus: false,
+      data: {
+        mode: 'edit',
+        title: board.title,
+        description: board.description,
+      },
+    });
+
+    dialogRef
+      .afterClosed()
+      .pipe(
+        switchMap((result: BoardFormDialogResult | undefined) => {
+          if (!result) {
+            return EMPTY;
+          }
+
+          this.isMutating.set(true);
+          return this.boardService.updateBoard(board.id, result);
+        }),
+      )
+      .subscribe({
+        next: (updatedBoard) => {
+          this.isMutating.set(false);
+
+          if (!updatedBoard) {
+            this.notification.warn('Board not found.');
+            return;
+          }
+
+          this.notification.success('Board updated.');
+        },
+        error: () => {
+          this.isMutating.set(false);
+          this.notification.warn('Unable to update board.');
         },
       });
   }

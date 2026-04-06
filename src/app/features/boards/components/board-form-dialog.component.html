@@ -1,4 +1,4 @@
-﻿<h2 mat-dialog-title>Create Board</h2>
+﻿<h2 mat-dialog-title>{{ mode === 'create' ? 'Create Board' : 'Edit Board' }}</h2>
 
 <mat-dialog-content>
   <form [formGroup]="form" class="dialog-form">
@@ -26,5 +26,7 @@
 
 <mat-dialog-actions align="end">
   <button mat-stroked-button mat-dialog-close type="button">Cancel</button>
-  <button mat-flat-button color="primary" (click)="save()" type="button">Create</button>
+  <button mat-flat-button color="primary" (click)="save()" type="button">
+    {{ mode === 'create' ? 'Create' : 'Save Changes' }}
+  </button>
 </mat-dialog-actions>

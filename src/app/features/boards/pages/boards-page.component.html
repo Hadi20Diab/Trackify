@@ -30,14 +30,24 @@
         <article class="board-card" tabindex="0" (click)="openBoard(board)" (keyup.enter)="openBoard(board)">
           <header class="board-card__header">
             <h3>{{ board.title }}</h3>
-            <button
-              mat-icon-button
-              type="button"
-              aria-label="Delete board"
-              (click)="$event.stopPropagation(); deleteBoard(board)"
-            >
-              <mat-icon>delete</mat-icon>
-            </button>
+            <div class="board-card__actions">
+              <button
+                mat-icon-button
+                type="button"
+                aria-label="Edit board"
+                (click)="$event.stopPropagation(); editBoard(board)"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                type="button"
+                aria-label="Delete board"
+                (click)="$event.stopPropagation(); deleteBoard(board)"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
           </header>
 
           <p>{{ board.description || 'No description provided for this board yet.' }}</p>

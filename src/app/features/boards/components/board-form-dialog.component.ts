@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 
 export interface BoardFormDialogData {
+  mode?: 'create' | 'edit';
   title?: string;
   description?: string;
 }
@@ -33,6 +34,7 @@ export class BoardFormDialogComponent {
   private readonly fb = inject(FormBuilder);
   private readonly dialogRef = inject(MatDialogRef<BoardFormDialogComponent, BoardFormDialogResult>);
   private readonly data = inject<BoardFormDialogData>(MAT_DIALOG_DATA, { optional: true }) ?? {};
+  readonly mode = this.data.mode ?? 'create';
 
   readonly form = this.fb.nonNullable.group({
     title: [this.data.title ?? '', [Validators.required, Validators.maxLength(80)]],

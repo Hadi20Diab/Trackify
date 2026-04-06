@@ -59,6 +59,30 @@ export class BoardService {
     );
   }
 
+  updateBoard(boardId: string, payload: CreateBoardPayload): Observable<Board | null> {
+    return of(null).pipe(
+      delay(API_DELAY_MS),
+      map(() => {
+        const boards = this.boardsSubject.value;
+        const boardToUpdate = boards.find((board) => board.id === boardId);
+
+        if (!boardToUpdate) {
+          return null;
+        }
+
+        const updatedBoard: Board = {
+          ...boardToUpdate,
+          title: payload.title.trim(),
+          description: payload.description.trim(),
+        };
+
+        const nextBoards = boards.map((board) => (board.id === boardId ? updatedBoard : board));
+        this.persistBoards(nextBoards);
+        return updatedBoard;
+      }),
+    );
+  }
+
   deleteBoard(boardId: string): Observable<Board[]> {
     return of(null).pipe(
       delay(API_DELAY_MS),
