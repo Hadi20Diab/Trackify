@@ -27,8 +27,22 @@
   /* Material fallbacks to avoid unresolved outlined-button variables. */
   --mat-button-outlined-label-text-color: var(--brand-700);
   --mat-button-outlined-outline-color: color-mix(in srgb, var(--brand-500) 38%, var(--surface-border));
+  --mat-button-filled-touch-target-size: 48px;
   --mat-button-outlined-touch-target-size: 48px;
+  --mat-button-protected-touch-target-size: 48px;
+  --mat-button-text-touch-target-size: 48px;
+  --mat-button-tonal-touch-target-size: 48px;
+  --mat-button-filled-touch-target-display: block;
+  --mat-button-protected-touch-target-display: block;
+  --mat-button-text-touch-target-display: block;
+  --mat-button-tonal-touch-target-display: block;
   --mat-button-outlined-touch-target-display: block;
+  --mat-icon-button-touch-target-size: 48px;
+  --mat-icon-button-touch-target-display: block;
+  --mat-fab-touch-target-size: 48px;
+  --mat-fab-small-touch-target-size: 48px;
+  --mat-fab-touch-target-display: block;
+  --mat-fab-small-touch-target-display: block;
 }
 
 body.theme-dark {
@@ -55,8 +69,6 @@ body.theme-dark {
 
   --mat-button-outlined-label-text-color: #bfd4ff;
   --mat-button-outlined-outline-color: color-mix(in srgb, var(--brand-500) 52%, var(--surface-border));
-  --mat-button-outlined-touch-target-size: 48px;
-  --mat-button-outlined-touch-target-display: block;
 }
 
 * {
