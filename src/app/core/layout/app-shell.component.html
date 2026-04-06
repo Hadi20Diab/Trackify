@@ -83,8 +83,17 @@
     </section>
   </aside>
 
+  @if (isMobileViewport() && !isSidebarCollapsed()) {
+    <button
+      type="button"
+      class="sidebar-backdrop"
+      (click)="toggleSidebar()"
+      aria-label="Close sidebar"
+    ></button>
+  }
+
   <main class="workspace">
-    @if (isSidebarCollapsed()) {
+    @if (isSidebarCollapsed() && isMobileViewport()) {
       <button
         mat-mini-fab
         type="button"
