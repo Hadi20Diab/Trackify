@@ -160,7 +160,6 @@
   border-radius: 14px;
   background: color-mix(in srgb, var(--warning) 18%, transparent);
   border: 1px solid color-mix(in srgb, var(--warning) 45%, var(--surface-border));
-  color: var(--warning-text);
   padding: 0.55rem 0.75rem;
   display: inline-flex;
   align-items: center;
