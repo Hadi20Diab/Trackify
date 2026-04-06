@@ -1,0 +1,11 @@
+﻿<section class="empty-state">
+  <mat-icon class="empty-state__icon">{{ icon() }}</mat-icon>
+  <h2>{{ title() }}</h2>
+  <p>{{ description() }}</p>
+
+  @if (actionLabel()) {
+    <button mat-flat-button color="primary" type="button">
+      {{ actionLabel() }}
+    </button>
+  }
+</section>

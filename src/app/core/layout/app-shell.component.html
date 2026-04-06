@@ -1,0 +1,64 @@
+﻿<div class="app-shell">
+  <aside class="sidebar">
+    <section class="brand">
+      <div class="brand__glyph">س</div>
+      <div>
+        <h1>Trackify</h1>
+        <p>Task Management Hub</p>
+      </div>
+    </section>
+
+    <section class="sidebar__quick-actions">
+      <a mat-stroked-button class="nav-btn" routerLink="/boards" routerLinkActive="nav-btn--active">
+        <mat-icon>view_kanban</mat-icon>
+        Boards
+      </a>
+      <a mat-stroked-button class="nav-btn" routerLink="/board" routerLinkActive="nav-btn--active">
+        <mat-icon>insights</mat-icon>
+        Open Workspace
+      </a>
+    </section>
+
+    <section class="sidebar__boards">
+      <header>
+        <h2>Your Boards</h2>
+        @if ((boards$ | async)?.length) {
+          <span>{{ (boards$ | async)?.length }}</span>
+        }
+      </header>
+
+      <div class="board-links">
+        @for (board of boards$ | async; track trackBoard($index, board)) {
+          <a
+            class="board-link"
+            [routerLink]="['/board', board.id]"
+            routerLinkActive="board-link--active"
+            [class.board-link--last]="(lastOpenedBoardId$ | async) === board.id"
+            (click)="persistOpenedBoard(board.id)"
+          >
+            <span class="board-link__title">{{ board.title }}</span>
+            @if (board.description) {
+              <span class="board-link__description">{{ board.description }}</span>
+            }
+          </a>
+        }
+      </div>
+    </section>
+
+    <section class="sidebar__theme">
+      <button
+        mat-button
+        type="button"
+        (click)="toggleTheme()"
+        [matTooltip]="(isDarkMode$ | async) ? 'Switch to light mode' : 'Switch to dark mode'"
+      >
+        <mat-icon>{{ (isDarkMode$ | async) ? 'light_mode' : 'dark_mode' }}</mat-icon>
+        {{ (isDarkMode$ | async) ? 'Light Mode' : 'Dark Mode' }}
+      </button>
+    </section>
+  </aside>
+
+  <main class="workspace">
+    <router-outlet></router-outlet>
+  </main>
+</div>

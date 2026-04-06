@@ -1,0 +1,13 @@
+﻿.board-entry {
+  min-height: 55vh;
+  display: grid;
+  place-items: center;
+  gap: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.board-entry p {
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}

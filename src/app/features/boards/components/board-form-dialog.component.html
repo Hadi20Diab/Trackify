@@ -1,0 +1,30 @@
+﻿<h2 mat-dialog-title>Create Board</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="dialog-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Board title</mat-label>
+      <input formControlName="title" matInput placeholder="Sprint Planning" />
+      <mat-hint align="end">{{ form.controls.title.value.length }}/80</mat-hint>
+      @if (form.controls.title.hasError('required')) {
+        <mat-error>Title is required.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Description</mat-label>
+      <textarea
+        formControlName="description"
+        matInput
+        rows="4"
+        placeholder="Describe the board goal and workflow"
+      ></textarea>
+      <mat-hint align="end">{{ form.controls.description.value.length }}/400</mat-hint>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button mat-dialog-close type="button">Cancel</button>
+  <button mat-flat-button color="primary" (click)="save()" type="button">Create</button>
+</mat-dialog-actions>

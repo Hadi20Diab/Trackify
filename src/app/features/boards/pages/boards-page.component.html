@@ -1,0 +1,58 @@
+﻿<section class="boards-page">
+  <header class="boards-page__header">
+    <div>
+      <p class="eyebrow">Workspace</p>
+      <h2>Boards Dashboard</h2>
+      <p class="subtitle">Organize work streams with flexible Kanban boards and custom workflows.</p>
+    </div>
+
+    <button mat-flat-button color="primary" type="button" (click)="createBoard()" [disabled]="isCreating()">
+      <mat-icon>add</mat-icon>
+      New Board
+    </button>
+  </header>
+
+  @if (isLoading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  @if ((boards$ | async)?.length === 0 && !isLoading()) {
+    <app-empty-state
+      icon="space_dashboard"
+      title="No boards yet"
+      description="Create your first board to start planning tasks, priorities, and sprint flow."
+    />
+  }
+
+  @if ((boards$ | async)?.length) {
+    <section class="boards-grid">
+      @for (board of boards$ | async; track trackBoard($index, board)) {
+        <article class="board-card" tabindex="0" (click)="openBoard(board)" (keyup.enter)="openBoard(board)">
+          <header class="board-card__header">
+            <h3>{{ board.title }}</h3>
+            <button
+              mat-icon-button
+              type="button"
+              aria-label="Delete board"
+              (click)="$event.stopPropagation(); deleteBoard(board)"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </header>
+
+          <p>{{ board.description || 'No description provided for this board yet.' }}</p>
+
+          <footer>
+            <span>
+              <mat-icon>event</mat-icon>
+              {{ board.createdAt | date: 'MMM d, y' }}
+            </span>
+            <button mat-button type="button" (click)="$event.stopPropagation(); openBoard(board)">
+              Open Board
+            </button>
+          </footer>
+        </article>
+      }
+    </section>
+  }
+</section>

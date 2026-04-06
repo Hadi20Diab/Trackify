@@ -1,0 +1,163 @@
+﻿<section class="board-detail">
+  @if (isLoading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  @if (isMutating()) {
+    <mat-progress-bar mode="indeterminate" class="mutation-bar"></mat-progress-bar>
+  }
+
+  @if (board$ | async; as board) {
+    <header class="board-detail__hero">
+      <div>
+        <p class="eyebrow">Kanban Board</p>
+        <h2>{{ board.title }}</h2>
+        <p class="hero-description">{{ board.description || 'No description yet. Add details to keep your team aligned.' }}</p>
+        <span class="hero-date">
+          <mat-icon>event</mat-icon>
+          Created {{ board.createdAt | date: 'MMM d, y' }}
+        </span>
+      </div>
+
+      <div class="hero-actions">
+        <button mat-stroked-button type="button" (click)="openCreateColumn()">
+          <mat-icon>view_column</mat-icon>
+          Add Column
+        </button>
+        <button mat-flat-button color="primary" type="button" (click)="openCreateTask()">
+          <mat-icon>add_task</mat-icon>
+          Add Task
+        </button>
+      </div>
+    </header>
+
+    <section class="board-detail__filters" [formGroup]="filterForm">
+      <mat-form-field appearance="outline" class="filter-search">
+        <mat-label>Search tasks</mat-label>
+        <input matInput formControlName="search" placeholder="Search by task title" />
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Priority</mat-label>
+        <mat-select formControlName="priority">
+          @for (priority of priorities; track priority) {
+            <mat-option [value]="priority">{{ priority === 'all' ? 'All priorities' : (priority | titlecase) }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Column</mat-label>
+        <mat-select formControlName="columnId">
+          <mat-option value="all">All columns</mat-option>
+          @for (column of columns$ | async; track column.id) {
+            <mat-option [value]="column.id">{{ column.title }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Swimlanes</mat-label>
+        <mat-select formControlName="swimlane">
+          @for (mode of groupingModes; track mode) {
+            <mat-option [value]="mode">
+              {{ mode === 'none' ? 'No Grouping' : (mode === 'dueDate' ? 'Due Date' : 'Priority') }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      @if (hasActiveFilters$ | async) {
+        <button mat-button type="button" (click)="resetFilters()">
+          <mat-icon>restart_alt</mat-icon>
+          Reset
+        </button>
+      }
+    </section>
+
+    @if (!(canDragTasks$ | async)) {
+      <p class="drag-hint">
+        <mat-icon>lock</mat-icon>
+        Drag and drop is available only when search, filters, and swimlanes are disabled.
+      </p>
+    }
+
+    @if (columnViewModels$ | async; as columnViews) {
+      <div class="board-columns" cdkDropList cdkDropListOrientation="horizontal" [cdkDropListData]="columnViews" (cdkDropListDropped)="onColumnDrop($event)">
+        @for (view of columnViews; track trackByColumn($index, view)) {
+          <article class="column" cdkDrag>
+            <header class="column__header" cdkDragHandle>
+              <div>
+                <h3>{{ view.column.title }}</h3>
+                <span>{{ view.tasks.length }} tasks</span>
+              </div>
+
+              <div class="column__actions">
+                <button mat-icon-button type="button" (click)="openCreateTask(view.column.id)" aria-label="Add task">
+                  <mat-icon>add</mat-icon>
+                </button>
+                <button mat-icon-button type="button" [matMenuTriggerFor]="columnMenu" aria-label="Column actions">
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+              </div>
+
+              <mat-menu #columnMenu="matMenu">
+                <button mat-menu-item type="button" (click)="renameColumn(view.column)">
+                  <mat-icon>edit</mat-icon>
+                  <span>Rename</span>
+                </button>
+                <button mat-menu-item type="button" (click)="deleteColumn(view.column.id)">
+                  <mat-icon>delete</mat-icon>
+                  <span>Delete</span>
+                </button>
+              </mat-menu>
+            </header>
+
+            <div
+              class="column__task-list"
+              cdkDropList
+              [id]="view.column.id"
+              [cdkDropListConnectedTo]="(connectedDropLists$ | async) ?? []"
+              [cdkDropListData]="view.tasks"
+              [cdkDropListDisabled]="!(canDragTasks$ | async)"
+              (cdkDropListDropped)="onTaskDrop($event, view.column.id)"
+            >
+              @if (view.tasks.length === 0) {
+                <section class="column__empty">
+                  <mat-icon>checklist</mat-icon>
+                  No tasks in this column
+                </section>
+              }
+
+              @for (lane of view.lanes; track trackByLane($index, lane)) {
+                <section class="swimlane">
+                  @if (filterForm.controls.swimlane.value !== 'none') {
+                    <header>
+                      <h4>{{ lane.label }}</h4>
+                      <span>{{ lane.tasks.length }}</span>
+                    </header>
+                  }
+
+                  <div class="swimlane__tasks">
+                    @for (task of lane.tasks; track trackByTask($index, task)) {
+                      <div cdkDrag [cdkDragData]="task" [cdkDragDisabled]="!(canDragTasks$ | async)">
+                        <app-task-card [task]="task" (edit)="editTask($event)" (delete)="deleteTask($event)"></app-task-card>
+                      </div>
+                    }
+                  </div>
+                </section>
+              }
+            </div>
+          </article>
+        }
+      </div>
+    }
+  } @else {
+    <app-empty-state
+      icon="warning"
+      title="Board unavailable"
+      description="The board could not be loaded. Return to your board list and try again."
+    />
+  }
+</section>
