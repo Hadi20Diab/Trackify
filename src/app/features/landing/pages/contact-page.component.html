@@ -1,0 +1,69 @@
+﻿<section class="public-page">
+  <app-public-header />
+
+  <main class="public-page__content">
+    <section class="contact-layout">
+      <article class="contact-intro">
+        <p class="eyebrow">Contact Us</p>
+        <h1>Talk to the Trackify Team</h1>
+        <p>
+          Need onboarding help, implementation support, or custom deployment guidance? Send us your message and we will get back to you.
+        </p>
+
+        <ul>
+          <li>Response window: within 24 hours</li>
+          <li>Support for product setup and architecture questions</li>
+          <li>Technical collaboration for backend integrations</li>
+        </ul>
+      </article>
+
+      <article class="contact-form-wrap">
+        <form [formGroup]="form" (ngSubmit)="send()" class="contact-form">
+          <mat-form-field appearance="outline">
+            <mat-label>Full name</mat-label>
+            <input matInput formControlName="name" />
+            @if (form.controls.name.hasError('required')) {
+              <mat-error>Name is required.</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" type="email" />
+            @if (form.controls.email.hasError('required')) {
+              <mat-error>Email is required.</mat-error>
+            }
+            @if (form.controls.email.hasError('email')) {
+              <mat-error>Enter a valid email address.</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Subject</mat-label>
+            <input matInput formControlName="subject" />
+            @if (form.controls.subject.hasError('required')) {
+              <mat-error>Subject is required.</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Message</mat-label>
+            <textarea matInput rows="6" formControlName="message"></textarea>
+            @if (form.controls.message.hasError('required')) {
+              <mat-error>Message is required.</mat-error>
+            }
+          </mat-form-field>
+
+          <button mat-flat-button color="primary" type="submit" [disabled]="isSubmitting()">
+            @if (isSubmitting()) {
+              <mat-spinner diameter="18"></mat-spinner>
+            } @else {
+              <mat-icon>send</mat-icon>
+            }
+            Send Message
+          </button>
+        </form>
+      </article>
+    </section>
+  </main>
+</section>

@@ -11,6 +11,27 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'features',
+    loadComponent: () =>
+      import('./features/landing/pages/features-page.component').then(
+        (module) => module.FeaturesPageComponent,
+      ),
+  },
+  {
+    path: 'about',
+    loadComponent: () =>
+      import('./features/landing/pages/about-page.component').then(
+        (module) => module.AboutPageComponent,
+      ),
+  },
+  {
+    path: 'contact',
+    loadComponent: () =>
+      import('./features/landing/pages/contact-page.component').then(
+        (module) => module.ContactPageComponent,
+      ),
+  },
+  {
     path: '',
     component: AppShellComponent,
     children: [

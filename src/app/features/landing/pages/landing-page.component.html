@@ -1,53 +1,74 @@
 ﻿<section class="landing-page">
   <div class="landing-page__ambient"></div>
+  <app-public-header />
 
-  <header class="landing-page__topbar">
-    <div class="brand">
-      <div class="brand__glyph">T</div>
-      <div>
-        <h1>Trackify</h1>
-        <p>Task Management Dashboard</p>
+  <section class="landing-hero">
+    <div class="landing-hero__copy">
+      <p class="eyebrow">Enterprise-grade Task Intelligence</p>
+      <h1>Trackify gives your team one clear mission control for planning and delivery.</h1>
+      <p>
+        Manage boards, custom workflows, priorities, and swimlanes in a highly visual workspace designed for real teams shipping real products.
+      </p>
+
+      <div class="landing-hero__actions">
+        <a mat-flat-button color="primary" routerLink="/boards">
+          <mat-icon>rocket_launch</mat-icon>
+          Start Building Boards
+        </a>
+        <a mat-stroked-button routerLink="/features">
+          <mat-icon>auto_awesome</mat-icon>
+          Explore Features
+        </a>
+      </div>
+
+      <div class="landing-stats">
+        <article>
+          <h3>Dynamic Boards</h3>
+          <p>Fully customizable columns and drag-drop workflows.</p>
+        </article>
+        <article>
+          <h3>Custom Swimlanes</h3>
+          <p>Create lane rules by priority, due status, or column.</p>
+        </article>
+        <article>
+          <h3>Production UX</h3>
+          <p>Responsive interface with dark mode and rich interactions.</p>
+        </article>
       </div>
     </div>
 
-    <a mat-stroked-button routerLink="/boards">
-      <mat-icon>dashboard</mat-icon>
-      Open Workspace
-    </a>
-  </header>
+    <div class="landing-hero__panel">
+      <h2>Everything Teams Need</h2>
+      <ul>
+        <li>Task lifecycle management with drag-and-drop</li>
+        <li>Board-level persistence and workspace memory</li>
+        <li>Advanced search and combined filtering</li>
+        <li>Ready for backend APIs with service abstraction</li>
+        <li>Fast setup with clean architecture</li>
+      </ul>
+      <a mat-button routerLink="/contact">Talk to our team</a>
+    </div>
+  </section>
 
-  <main class="landing-page__hero">
-    <section class="hero-copy">
-      <p class="eyebrow">Built For High Velocity Teams</p>
-      <h2>Plan, track, and deliver work with a polished Kanban flow.</h2>
+  <section class="landing-sections">
+    <article>
+      <h2>Why Trackify</h2>
       <p>
-        Trackify combines dynamic boards, custom columns, swimlanes, and smart filters to keep every sprint and delivery stream organized.
+        We focus on clarity, predictability, and speed. Every detail in Trackify is built to reduce decision friction and keep teams aligned.
       </p>
-
-      <div class="hero-actions">
-        <a mat-flat-button color="primary" routerLink="/boards">
-          <mat-icon>rocket_launch</mat-icon>
-          Create Your First Board
-        </a>
-        <a mat-button routerLink="/board">
-          Continue Last Workspace
-        </a>
-      </div>
-    </section>
-
-    <section class="hero-panel">
-      <article>
-        <h3>Dynamic Workflow</h3>
-        <p>Add and reorder columns per board to match your exact process.</p>
-      </article>
-      <article>
-        <h3>Swimlane Visibility</h3>
-        <p>Slice tasks by priority, due windows, or custom criteria.</p>
-      </article>
-      <article>
-        <h3>Production-Ready UX</h3>
-        <p>Dark mode, smooth interactions, and clean navigation designed for daily use.</p>
-      </article>
-    </section>
-  </main>
+    </article>
+    <article>
+      <h2>Built to Scale</h2>
+      <p>
+        The architecture is API-first, modular, and backend-ready. Swap local persistence with a real service without rewriting UI flows.
+      </p>
+    </article>
+    <article>
+      <h2>Ready to Start?</h2>
+      <p>
+        Jump into the workspace now or learn more about our approach from the About and Contact pages.
+      </p>
+      <a mat-flat-button color="primary" routerLink="/boards">Open Workspace</a>
+    </article>
+  </section>
 </section>

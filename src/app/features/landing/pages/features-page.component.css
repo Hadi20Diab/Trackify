@@ -1,0 +1,75 @@
+﻿.public-page {
+  min-height: 100vh;
+  padding: 1rem;
+  display: grid;
+  gap: 1rem;
+  background:
+    radial-gradient(58% 52% at 12% 8%, color-mix(in srgb, var(--brand-500) 18%, transparent), transparent 65%),
+    var(--page-background);
+}
+
+.public-page__content {
+  max-width: 1240px;
+  margin: 0 auto 1rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.public-page__hero {
+  border-radius: 22px;
+  border: 1px solid var(--surface-border);
+  background: color-mix(in srgb, var(--surface-card) 92%, transparent);
+  padding: 1.2rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+}
+
+.public-page__hero h1 {
+  margin: 0.65rem 0 0.45rem;
+  color: var(--text-primary);
+  font-size: clamp(1.8rem, 3vw, 3rem);
+}
+
+.public-page__hero p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.62;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.feature-grid article {
+  border-radius: 16px;
+  border: 1px solid var(--surface-border);
+  background: color-mix(in srgb, var(--surface-card) 90%, transparent);
+  padding: 0.95rem;
+}
+
+.feature-grid h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.05rem;
+}
+
+.feature-grid p {
+  margin: 0.4rem 0 0;
+  color: var(--text-secondary);
+  line-height: 1.56;
+}
+
+@media (max-width: 1040px) {
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+}
