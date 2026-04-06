@@ -1,1 +1,110 @@
-/* You can add global styles to this file, and also import other style files */
+﻿@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import '@angular/material/prebuilt-themes/azure-blue.css';
+
+:root {
+  --brand-500: #2a63f6;
+  --brand-700: #1d46b6;
+  --accent-cyan: #1cc2d4;
+
+  --page-background: #f4f7ff;
+  --surface-card: #ffffff;
+  --surface-panel: #f9fbff;
+  --surface-muted: #f4f8ff;
+  --surface-border: #d9e4f3;
+
+  --text-primary: #11233f;
+  --text-secondary: #3d577d;
+  --text-tertiary: #6780a2;
+
+  --warning: #f2ad36;
+  --warning-text: #7b530c;
+
+  --shadow-sm: 0 8px 20px rgba(22, 46, 88, 0.08);
+  --shadow-md: 0 14px 28px rgba(20, 43, 85, 0.12);
+  --shadow-lg: 0 20px 36px rgba(18, 39, 76, 0.16);
+}
+
+body.theme-dark {
+  --brand-500: #5f8cff;
+  --brand-700: #3f6de0;
+  --accent-cyan: #44d8ea;
+
+  --page-background: #0f1726;
+  --surface-card: #162238;
+  --surface-panel: #1a2942;
+  --surface-muted: #1f3350;
+  --surface-border: #2f4468;
+
+  --text-primary: #edf3ff;
+  --text-secondary: #bed1f0;
+  --text-tertiary: #8fa8d0;
+
+  --warning: #ffbf55;
+  --warning-text: #3f2b06;
+
+  --shadow-sm: 0 8px 20px rgba(3, 6, 15, 0.32);
+  --shadow-md: 0 14px 30px rgba(2, 5, 14, 0.42);
+  --shadow-lg: 0 20px 42px rgba(0, 2, 10, 0.55);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: 'Manrope', 'Cairo', sans-serif;
+  color: var(--text-primary);
+  background:
+    radial-gradient(66% 45% at 100% 0%, color-mix(in srgb, var(--brand-500) 12%, transparent), transparent 58%),
+    radial-gradient(52% 35% at 0% 100%, color-mix(in srgb, var(--accent-cyan) 11%, transparent), transparent 62%),
+    var(--page-background);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--brand-500) 36%, transparent);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-track {
+  background: color-mix(in srgb, var(--surface-card) 88%, transparent);
+}
+
+mat-form-field {
+  --mdc-filled-text-field-container-shape: 12px;
+  --mdc-outlined-text-field-container-shape: 12px;
+}
+
+mat-progress-bar {
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.mat-mdc-snack-bar-container.toast-success .mdc-snackbar__surface {
+  background: #145f53;
+  color: #f3fffc;
+}
+
+.mat-mdc-snack-bar-container.toast-info .mdc-snackbar__surface {
+  background: #1c3b7a;
+  color: #f3f7ff;
+}
+
+.mat-mdc-snack-bar-container.toast-warn .mdc-snackbar__surface {
+  background: #7d3f0f;
+  color: #fff7ed;
+}
+
+.mat-mdc-snack-bar-container .mat-mdc-button {
+  color: inherit !important;
+}
