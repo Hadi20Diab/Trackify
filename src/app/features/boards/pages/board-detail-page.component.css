@@ -3,6 +3,13 @@
   gap: 1rem;
 }
 
+.context-menu-anchor {
+  position: fixed;
+  width: 0;
+  height: 0;
+  visibility: hidden;
+}
+
 .mutation-bar {
   margin-top: -0.75rem;
 }
@@ -252,3 +259,5 @@
     grid-template-columns: 1fr;
   }
 }
+
+

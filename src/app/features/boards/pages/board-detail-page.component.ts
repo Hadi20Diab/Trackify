@@ -8,7 +8,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatMenuModule } from '@angular/material/menu';
+import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -105,6 +105,9 @@ export class BoardDetailPageComponent implements OnInit {
 
   readonly isLoading = signal(true);
   readonly isMutating = signal(false);
+  readonly contextMenuPosition = signal({ x: '0px', y: '0px' });
+  readonly contextColumn = signal<BoardColumn | null>(null);
+  readonly contextTask = signal<TaskItem | null>(null);
 
   readonly groupingModes: SwimlaneMode[] = ['none', 'priority', 'dueDate'];
   readonly priorities: Array<TaskPriority | 'all'> = ['all', 'high', 'medium', 'low'];
@@ -513,6 +516,28 @@ export class BoardDetailPageComponent implements OnInit {
           this.notification.warn('Failed to delete column.');
         },
       });
+  }
+
+  openColumnContextMenu(event: MouseEvent, column: BoardColumn, trigger: MatMenuTrigger): void {
+    event.preventDefault();
+    this.contextColumn.set(column);
+    this.contextMenuPosition.set({
+      x: `${event.clientX}px`,
+      y: `${event.clientY}px`,
+    });
+    trigger.closeMenu();
+    trigger.openMenu();
+  }
+
+  openTaskContextMenu(event: MouseEvent, task: TaskItem, trigger: MatMenuTrigger): void {
+    event.preventDefault();
+    this.contextTask.set(task);
+    this.contextMenuPosition.set({
+      x: `${event.clientX}px`,
+      y: `${event.clientY}px`,
+    });
+    trigger.closeMenu();
+    trigger.openMenu();
   }
 
   onColumnDrop(event: CdkDragDrop<ColumnViewModel[]>): void {

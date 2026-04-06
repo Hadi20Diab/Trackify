@@ -1,4 +1,50 @@
 ﻿<section class="board-detail">
+  <div
+    class="context-menu-anchor"
+    [style.left]="contextMenuPosition().x"
+    [style.top]="contextMenuPosition().y"
+    [matMenuTriggerFor]="columnContextMenu"
+    #columnContextTrigger="matMenuTrigger"
+  ></div>
+
+  <mat-menu #columnContextMenu="matMenu">
+    @if (contextColumn(); as selectedColumn) {
+      <button mat-menu-item type="button" (click)="openCreateTask(selectedColumn.id)">
+        <mat-icon>add_task</mat-icon>
+        <span>Add Task</span>
+      </button>
+      <button mat-menu-item type="button" (click)="renameColumn(selectedColumn)">
+        <mat-icon>edit</mat-icon>
+        <span>Rename Column</span>
+      </button>
+      <button mat-menu-item type="button" (click)="deleteColumn(selectedColumn.id)">
+        <mat-icon>delete</mat-icon>
+        <span>Delete Column</span>
+      </button>
+    }
+  </mat-menu>
+
+  <div
+    class="context-menu-anchor"
+    [style.left]="contextMenuPosition().x"
+    [style.top]="contextMenuPosition().y"
+    [matMenuTriggerFor]="taskContextMenu"
+    #taskContextTrigger="matMenuTrigger"
+  ></div>
+
+  <mat-menu #taskContextMenu="matMenu">
+    @if (contextTask(); as selectedTask) {
+      <button mat-menu-item type="button" (click)="editTask(selectedTask.id)">
+        <mat-icon>edit</mat-icon>
+        <span>Edit Task</span>
+      </button>
+      <button mat-menu-item type="button" (click)="deleteTask(selectedTask.id)">
+        <mat-icon>delete</mat-icon>
+        <span>Delete Task</span>
+      </button>
+    }
+  </mat-menu>
+
   @if (isLoading()) {
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
   }
@@ -90,7 +136,7 @@
     @if (columnViewModels$ | async; as columnViews) {
       <div class="board-columns" cdkDropList cdkDropListOrientation="horizontal" [cdkDropListData]="columnViews" (cdkDropListDropped)="onColumnDrop($event)">
         @for (view of columnViews; track trackByColumn($index, view)) {
-          <article class="column" cdkDrag>
+          <article class="column" cdkDrag (contextmenu)="openColumnContextMenu($event, view.column, columnContextTrigger)">
             <header class="column__header" cdkDragHandle>
               <div>
                 <h3>{{ view.column.title }}</h3>
@@ -145,7 +191,12 @@
 
                   <div class="swimlane__tasks">
                     @for (task of lane.tasks; track trackByTask($index, task)) {
-                      <div cdkDrag [cdkDragData]="task" [cdkDragDisabled]="!(canDragTasks$ | async)">
+                      <div
+                        cdkDrag
+                        [cdkDragData]="task"
+                        [cdkDragDisabled]="!(canDragTasks$ | async)"
+                        (contextmenu)="openTaskContextMenu($event, task, taskContextTrigger)"
+                      >
                         <app-task-card [task]="task" (edit)="editTask($event)" (delete)="deleteTask($event)"></app-task-card>
                       </div>
                     }
