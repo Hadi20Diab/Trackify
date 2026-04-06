@@ -1,0 +1,6 @@
+﻿.dialog-form {
+  display: grid;
+  gap: 0.9rem;
+  min-width: min(92vw, 430px);
+  padding-top: 0.35rem;
+}

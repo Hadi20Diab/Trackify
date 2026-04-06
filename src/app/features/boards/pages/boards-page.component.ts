@@ -13,6 +13,7 @@ import { BoardService } from '../../../services/board.service';
 import { ColumnService } from '../../../services/column.service';
 import { NotificationService } from '../../../services/notification.service';
 import { TaskService } from '../../../services/task.service';
+import { SwimlaneService } from '../../../services/swimlane.service';
 import {
   BoardFormDialogComponent,
   BoardFormDialogResult,
@@ -41,6 +42,7 @@ export class BoardsPageComponent implements OnInit {
   private readonly notification = inject(NotificationService);
   private readonly dialog = inject(MatDialog);
   private readonly router = inject(Router);
+  private readonly swimlaneService = inject(SwimlaneService);
 
   readonly boards$ = this.boardService.boards$;
   readonly isLoading = signal(true);
@@ -112,6 +114,7 @@ export class BoardsPageComponent implements OnInit {
           forkJoin([
             this.columnService.deleteColumnsByBoard(board.id),
             this.taskService.deleteTasksByBoard(board.id),
+            this.swimlaneService.deleteSwimlanesByBoard(board.id),
           ]),
         ),
       )

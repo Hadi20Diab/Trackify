@@ -87,6 +87,70 @@
   min-width: 0;
 }
 
+.swimlane-manager {
+  border-radius: 16px;
+  border: 1px solid var(--surface-border);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-sm);
+  padding: 0.7rem;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.swimlane-manager > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.swimlane-manager h3 {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.swimlane-manager__empty {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.swimlane-manager__list {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.swimlane-rule {
+  border: 1px solid var(--surface-border);
+  background: color-mix(in srgb, var(--surface-card) 90%, transparent);
+  border-radius: 12px;
+  padding: 0.5rem 0.65rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.swimlane-rule h4 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+}
+
+.swimlane-rule p {
+  margin: 0.2rem 0 0;
+  font-size: 0.74rem;
+  color: var(--text-tertiary);
+}
+
+.swimlane-rule__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
 .drag-hint {
   margin: 0;
   border-radius: 14px;

@@ -1,0 +1,39 @@
+﻿<h2 mat-dialog-title>{{ data.mode === 'create' ? 'Create Swimlane' : 'Edit Swimlane' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="dialog-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Swimlane name</mat-label>
+      <input matInput formControlName="name" placeholder="Critical Issues" />
+      <mat-hint align="end">{{ form.controls.name.value.length }}/60</mat-hint>
+      @if (form.controls.name.hasError('required')) {
+        <mat-error>Name is required.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Criteria type</mat-label>
+      <mat-select formControlName="criteriaType">
+        @for (criteriaType of criteriaTypes; track criteriaType) {
+          <mat-option [value]="criteriaType">{{ criteriaType | titlecase }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Criteria value</mat-label>
+      <mat-select formControlName="criteriaValue">
+        @for (option of criteriaOptions(); track option.value) {
+          <mat-option [value]="option.value">{{ option.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button mat-dialog-close type="button">Cancel</button>
+  <button mat-flat-button color="primary" type="button" (click)="save()">
+    {{ data.mode === 'create' ? 'Create' : 'Save Changes' }}
+  </button>
+</mat-dialog-actions>

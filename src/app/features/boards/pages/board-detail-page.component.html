@@ -112,7 +112,15 @@
         <mat-select formControlName="swimlane">
           @for (mode of groupingModes; track mode) {
             <mat-option [value]="mode">
-              {{ mode === 'none' ? 'No Grouping' : (mode === 'dueDate' ? 'Due Date' : 'Priority') }}
+              {{
+                mode === 'none'
+                  ? 'No Grouping'
+                  : mode === 'dueDate'
+                    ? 'Due Date'
+                    : mode === 'custom'
+                      ? 'Custom'
+                      : 'Priority'
+              }}
             </mat-option>
           }
         </mat-select>
@@ -125,6 +133,44 @@
         </button>
       }
     </section>
+
+    @if (filterForm.controls.swimlane.value === 'custom') {
+      <section class="swimlane-manager">
+        <header>
+          <h3>Custom Swimlanes</h3>
+          <button mat-stroked-button type="button" (click)="openCreateSwimlane()">
+            <mat-icon>add</mat-icon>
+            Add Swimlane
+          </button>
+        </header>
+
+        @if ((customSwimlanes$ | async)?.length === 0) {
+          <p class="swimlane-manager__empty">
+            Define swimlanes to group tasks by priority, due status, or specific columns.
+          </p>
+        }
+
+        <div class="swimlane-manager__list">
+          @for (swimlane of customSwimlanes$ | async; track trackBySwimlaneRule($index, swimlane)) {
+            <article class="swimlane-rule">
+              <div>
+                <h4>{{ swimlane.name }}</h4>
+                <p>{{ getSwimlaneCriteriaLabel(swimlane) }}</p>
+              </div>
+
+              <div class="swimlane-rule__actions">
+                <button mat-icon-button type="button" aria-label="Edit swimlane" (click)="editSwimlane(swimlane)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button type="button" aria-label="Delete swimlane" (click)="deleteSwimlane(swimlane.id)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </article>
+          }
+        </div>
+      </section>
+    }
 
     @if (!(canDragTasks$ | async)) {
       <p class="drag-hint">
@@ -177,6 +223,13 @@
                 <section class="column__empty">
                   <mat-icon>checklist</mat-icon>
                   No tasks in this column
+                </section>
+              }
+
+              @if (filterForm.controls.swimlane.value === 'custom' && view.tasks.length > 0 && view.lanes.length === 0) {
+                <section class="column__empty">
+                  <mat-icon>hub</mat-icon>
+                  No custom swimlane matched tasks in this column
                 </section>
               }
 

@@ -30,11 +30,13 @@ import {
 import { BoardColumn } from '../../../models/column.model';
 import { SwimlaneMode } from '../../../models/board-view.model';
 import { TaskItem, TaskPriority } from '../../../models/task.model';
+import { SwimlaneRule } from '../../../models/swimlane.model';
 import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
 import { BoardService } from '../../../services/board.service';
 import { ColumnService } from '../../../services/column.service';
 import { NotificationService } from '../../../services/notification.service';
 import { TaskService } from '../../../services/task.service';
+import { SwimlaneService } from '../../../services/swimlane.service';
 import {
   ColumnFormDialogComponent,
   ColumnFormDialogResult,
@@ -49,6 +51,10 @@ import {
   BoardFormDialogComponent,
   BoardFormDialogResult,
 } from '../components/board-form-dialog.component';
+import {
+  SwimlaneFormDialogComponent,
+  SwimlaneFormDialogResult,
+} from '../components/swimlane-form-dialog.component';
 
 interface FilterFormValue {
   search: string;
@@ -102,6 +108,7 @@ export class BoardDetailPageComponent implements OnInit {
   private readonly columnService = inject(ColumnService);
   private readonly taskService = inject(TaskService);
   private readonly notification = inject(NotificationService);
+  private readonly swimlaneService = inject(SwimlaneService);
 
   readonly isLoading = signal(true);
   readonly isMutating = signal(false);
@@ -109,7 +116,7 @@ export class BoardDetailPageComponent implements OnInit {
   readonly contextColumn = signal<BoardColumn | null>(null);
   readonly contextTask = signal<TaskItem | null>(null);
 
-  readonly groupingModes: SwimlaneMode[] = ['none', 'priority', 'dueDate'];
+  readonly groupingModes: SwimlaneMode[] = ['none', 'priority', 'dueDate', 'custom'];
   readonly priorities: Array<TaskPriority | 'all'> = ['all', 'high', 'medium', 'low'];
 
   readonly filterForm = this.fb.nonNullable.group({
@@ -153,8 +160,23 @@ export class BoardDetailPageComponent implements OnInit {
     shareReplay({ bufferSize: 1, refCount: true }),
   );
 
-  readonly columnViewModels$ = combineLatest([this.columns$, this.tasks$, this.filters$]).pipe(
-    map(([columns, tasks, filters]) => this.buildColumnViewModels(columns, tasks, filters)),
+  readonly customSwimlanes$ = combineLatest([
+    this.activeBoardId$,
+    this.swimlaneService.swimlanesByBoard$,
+  ]).pipe(
+    map(([boardId, swimlanesByBoard]) => swimlanesByBoard[boardId] ?? []),
+    shareReplay({ bufferSize: 1, refCount: true }),
+  );
+
+  readonly columnViewModels$ = combineLatest([
+    this.columns$,
+    this.tasks$,
+    this.filters$,
+    this.customSwimlanes$,
+  ]).pipe(
+    map(([columns, tasks, filters, customSwimlanes]) =>
+      this.buildColumnViewModels(columns, tasks, filters, customSwimlanes),
+    ),
     shareReplay({ bufferSize: 1, refCount: true }),
   );
 
@@ -198,6 +220,7 @@ export class BoardDetailPageComponent implements OnInit {
             boards: this.boardService.getBoards(),
             columns: this.columnService.getColumnsByBoard(boardId),
             tasks: this.taskService.getTasksByBoard(boardId),
+            swimlanes: this.swimlaneService.getSwimlanesByBoard(boardId),
           }).pipe(
             switchMap(({ boards, columns }) => {
               const boardExists = boards.some((board) => board.id === boardId);
@@ -330,6 +353,101 @@ export class BoardDetailPageComponent implements OnInit {
           this.notification.warn('Unable to update board.');
         },
       });
+  }
+
+  openCreateSwimlane(): void {
+    const boardId = this.activeBoardIdSubject.value;
+    if (!boardId) {
+      return;
+    }
+
+    const columns = this.columnService.getColumnsSnapshot(boardId);
+
+    const dialogRef = this.dialog.open(SwimlaneFormDialogComponent, {
+      width: '520px',
+      autoFocus: false,
+      data: {
+        mode: 'create',
+        columns,
+      },
+    });
+
+    dialogRef
+      .afterClosed()
+      .pipe(
+        switchMap((result: SwimlaneFormDialogResult | undefined) => {
+          if (!result) {
+            return EMPTY;
+          }
+
+          return this.swimlaneService.createSwimlane({
+            boardId,
+            name: result.name,
+            criteriaType: result.criteriaType,
+            criteriaValue: result.criteriaValue,
+          });
+        }),
+      )
+      .subscribe({
+        next: () => this.notification.success('Custom swimlane created.'),
+        error: () => this.notification.warn('Failed to create swimlane.'),
+      });
+  }
+
+  editSwimlane(swimlane: SwimlaneRule): void {
+    const boardId = this.activeBoardIdSubject.value;
+    if (!boardId) {
+      return;
+    }
+
+    const columns = this.columnService.getColumnsSnapshot(boardId);
+
+    const dialogRef = this.dialog.open(SwimlaneFormDialogComponent, {
+      width: '520px',
+      autoFocus: false,
+      data: {
+        mode: 'edit',
+        columns,
+        initialValue: {
+          name: swimlane.name,
+          criteriaType: swimlane.criteriaType,
+          criteriaValue: swimlane.criteriaValue,
+        },
+      },
+    });
+
+    dialogRef
+      .afterClosed()
+      .pipe(
+        switchMap((result: SwimlaneFormDialogResult | undefined) => {
+          if (!result) {
+            return EMPTY;
+          }
+
+          return this.swimlaneService.updateSwimlane(boardId, swimlane.id, result);
+        }),
+      )
+      .subscribe({
+        next: () => this.notification.success('Swimlane updated.'),
+        error: () => this.notification.warn('Failed to update swimlane.'),
+      });
+  }
+
+  deleteSwimlane(swimlaneId: string): void {
+    const boardId = this.activeBoardIdSubject.value;
+    if (!boardId) {
+      return;
+    }
+
+    const confirmed = window.confirm('Delete this custom swimlane?');
+    if (!confirmed) {
+      return;
+    }
+
+    this.swimlaneService.deleteSwimlane(boardId, swimlaneId).subscribe({
+      next: () => this.notification.info('Swimlane deleted.'),
+      error: () => this.notification.warn('Failed to delete swimlane.'),
+    });
   }
 
   editTask(taskId: string): void {
@@ -596,10 +714,42 @@ export class BoardDetailPageComponent implements OnInit {
     return task.id;
   }
 
+  trackBySwimlaneRule(_index: number, swimlane: SwimlaneRule): string {
+    return swimlane.id;
+  }
+
+  getSwimlaneCriteriaLabel(swimlane: SwimlaneRule): string {
+    if (swimlane.criteriaType === 'priority') {
+      return `Priority: ${swimlane.criteriaValue}`;
+    }
+
+    if (swimlane.criteriaType === 'column') {
+      const boardId = this.activeBoardIdSubject.value;
+      const column =
+        boardId
+          ? this.columnService
+              .getColumnsSnapshot(boardId)
+              .find((entry) => entry.id === swimlane.criteriaValue)
+          : null;
+      return `Column: ${column?.title ?? 'Unknown'}`;
+    }
+
+    const dueLabels: Record<string, string> = {
+      overdue: 'Due: Overdue',
+      today: 'Due: Today',
+      next7days: 'Due: Next 7 Days',
+      later: 'Due: Later',
+      noDueDate: 'Due: No Due Date',
+    };
+
+    return dueLabels[swimlane.criteriaValue] ?? 'Due: Custom';
+  }
+
   private buildColumnViewModels(
     columns: BoardColumn[],
     tasks: TaskItem[],
     filters: FilterFormValue,
+    customSwimlanes: SwimlaneRule[],
   ): ColumnViewModel[] {
     const normalizedSearch = filters.search.trim().toLowerCase();
 
@@ -618,12 +768,16 @@ export class BoardDetailPageComponent implements OnInit {
       return {
         column,
         tasks: columnTasks,
-        lanes: this.createLanes(columnTasks, filters.swimlane),
+        lanes: this.createLanes(columnTasks, filters.swimlane, customSwimlanes),
       };
     });
   }
 
-  private createLanes(tasks: TaskItem[], mode: SwimlaneMode): ColumnLane[] {
+  private createLanes(
+    tasks: TaskItem[],
+    mode: SwimlaneMode,
+    customSwimlanes: SwimlaneRule[],
+  ): ColumnLane[] {
     if (mode === 'none') {
       return [
         {
@@ -645,49 +799,114 @@ export class BoardDetailPageComponent implements OnInit {
         .filter((lane) => lane.tasks.length > 0);
     }
 
+    if (mode === 'custom') {
+      return this.createCustomLanes(tasks, customSwimlanes);
+    }
+
     return this.createDueDateLanes(tasks);
   }
 
   private createDueDateLanes(tasks: TaskItem[]): ColumnLane[] {
+    const lanes: ColumnLane[] = [
+      { id: 'overdue', label: 'Overdue', tasks: [] },
+      { id: 'today', label: 'Today', tasks: [] },
+      { id: 'next7days', label: 'Next 7 Days', tasks: [] },
+      { id: 'later', label: 'Later', tasks: [] },
+      { id: 'noDueDate', label: 'No Due Date', tasks: [] },
+    ];
+
+    for (const task of tasks) {
+      const dueStatus = this.getDueStatusForTask(task);
+      const lane = lanes.find((entry) => entry.id === dueStatus);
+
+      if (lane) {
+        lane.tasks.push(task);
+      }
+    }
+
+    return lanes.filter((lane) => lane.tasks.length > 0);
+  }
+
+  private createCustomLanes(tasks: TaskItem[], customSwimlanes: SwimlaneRule[]): ColumnLane[] {
+    if (customSwimlanes.length === 0) {
+      return [];
+    }
+
+    const lanesById = new Map(
+      customSwimlanes.map((swimlane) => [
+        swimlane.id,
+        {
+          id: swimlane.id,
+          label: swimlane.name,
+          tasks: [] as TaskItem[],
+        },
+      ]),
+    );
+
+    const unassigned: TaskItem[] = [];
+
+    for (const task of tasks) {
+      const matchedSwimlane = customSwimlanes.find((swimlane) =>
+        this.taskMatchesSwimlane(task, swimlane),
+      );
+
+      if (!matchedSwimlane) {
+        unassigned.push(task);
+        continue;
+      }
+
+      lanesById.get(matchedSwimlane.id)?.tasks.push(task);
+    }
+
+    const filledLanes = [...lanesById.values()].filter((lane) => lane.tasks.length > 0);
+
+    if (unassigned.length > 0) {
+      filledLanes.push({
+        id: 'custom-unassigned',
+        label: 'Unassigned',
+        tasks: unassigned,
+      });
+    }
+
+    return filledLanes;
+  }
+
+  private taskMatchesSwimlane(task: TaskItem, swimlane: SwimlaneRule): boolean {
+    if (swimlane.criteriaType === 'priority') {
+      return task.priority === swimlane.criteriaValue;
+    }
+
+    if (swimlane.criteriaType === 'column') {
+      return task.columnId === swimlane.criteriaValue;
+    }
+
+    return this.getDueStatusForTask(task) === swimlane.criteriaValue;
+  }
+
+  private getDueStatusForTask(task: TaskItem): string {
     const startOfToday = this.startOfDay(new Date());
     const endOfWeek = new Date(startOfToday);
     endOfWeek.setDate(startOfToday.getDate() + 7);
 
-    const lanes: ColumnLane[] = [
-      { id: 'overdue', label: 'Overdue', tasks: [] },
-      { id: 'today', label: 'Today', tasks: [] },
-      { id: 'week', label: 'Next 7 Days', tasks: [] },
-      { id: 'later', label: 'Later', tasks: [] },
-      { id: 'none', label: 'No Due Date', tasks: [] },
-    ];
-
-    for (const task of tasks) {
-      if (!task.dueDate) {
-        lanes[4].tasks.push(task);
-        continue;
-      }
-
-      const dueDate = this.startOfDay(new Date(`${task.dueDate}T00:00:00`));
-
-      if (dueDate < startOfToday) {
-        lanes[0].tasks.push(task);
-        continue;
-      }
-
-      if (dueDate.getTime() === startOfToday.getTime()) {
-        lanes[1].tasks.push(task);
-        continue;
-      }
-
-      if (dueDate <= endOfWeek) {
-        lanes[2].tasks.push(task);
-        continue;
-      }
-
-      lanes[3].tasks.push(task);
+    if (!task.dueDate) {
+      return 'noDueDate';
     }
 
-    return lanes.filter((lane) => lane.tasks.length > 0);
+    const dueDate = this.startOfDay(new Date(`${task.dueDate}T00:00:00`));
+
+    if (dueDate < startOfToday) {
+      return 'overdue';
+    }
+
+    if (dueDate.getTime() === startOfToday.getTime()) {
+      return 'today';
+    }
+
+    if (dueDate <= endOfWeek) {
+      return 'next7days';
+    }
+
+    return 'later';
   }
 
   private startOfDay(date: Date): Date {
