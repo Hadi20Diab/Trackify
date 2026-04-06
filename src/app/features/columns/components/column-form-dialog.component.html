@@ -1,0 +1,21 @@
+﻿<h2 mat-dialog-title>{{ mode === 'create' ? 'Add Column' : 'Rename Column' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="dialog-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Column title</mat-label>
+      <input formControlName="title" matInput placeholder="In Review" />
+      <mat-hint align="end">{{ form.controls.title.value.length }}/50</mat-hint>
+      @if (form.controls.title.hasError('required')) {
+        <mat-error>Column title is required.</mat-error>
+      }
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button mat-dialog-close type="button">Cancel</button>
+  <button mat-flat-button color="primary" (click)="save()" type="button">
+    {{ mode === 'create' ? 'Add' : 'Save' }}
+  </button>
+</mat-dialog-actions>

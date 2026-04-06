@@ -1,0 +1,60 @@
+﻿<h2 mat-dialog-title>{{ data.mode === 'create' ? 'Create Task' : 'Edit Task' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="dialog-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Title</mat-label>
+      <input formControlName="title" matInput placeholder="Implement OAuth token refresh" />
+      <mat-hint align="end">{{ form.controls.title.value.length }}/120</mat-hint>
+      @if (form.controls.title.hasError('required')) {
+        <mat-error>Task title is required.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Description</mat-label>
+      <textarea
+        formControlName="description"
+        matInput
+        rows="4"
+        placeholder="Add context, acceptance criteria, and notes"
+      ></textarea>
+      <mat-hint align="end">{{ form.controls.description.value.length }}/1000</mat-hint>
+    </mat-form-field>
+
+    <div class="dialog-form__grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Status column</mat-label>
+        <mat-select formControlName="columnId">
+          @for (column of data.columns; track column.id) {
+            <mat-option [value]="column.id">{{ column.title }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Priority</mat-label>
+        <mat-select formControlName="priority">
+          @for (priority of priorities; track priority) {
+            <mat-option [value]="priority">{{ priority | titlecase }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Due date</mat-label>
+      <input formControlName="dueDate" matInput [matDatepicker]="dueDatePicker" />
+      <mat-datepicker-toggle matIconSuffix [for]="dueDatePicker"></mat-datepicker-toggle>
+      <mat-datepicker #dueDatePicker></mat-datepicker>
+      <mat-hint>Optional</mat-hint>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button mat-dialog-close type="button">Cancel</button>
+  <button mat-flat-button color="primary" (click)="save()" type="button">
+    {{ data.mode === 'create' ? 'Create task' : 'Save changes' }}
+  </button>
+</mat-dialog-actions>

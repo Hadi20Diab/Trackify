@@ -1,0 +1,35 @@
+﻿<article class="task-card" [class]="'priority-' + task().priority">
+  <header class="task-card__header">
+    <h4>{{ task().title }}</h4>
+
+    <button mat-icon-button [matMenuTriggerFor]="taskActions" type="button" aria-label="Task actions">
+      <mat-icon>more_horiz</mat-icon>
+    </button>
+
+    <mat-menu #taskActions="matMenu">
+      <button mat-menu-item type="button" (click)="onEdit()">
+        <mat-icon>edit</mat-icon>
+        <span>Edit task</span>
+      </button>
+      <button mat-menu-item type="button" (click)="onDelete()">
+        <mat-icon>delete</mat-icon>
+        <span>Delete task</span>
+      </button>
+    </mat-menu>
+  </header>
+
+  @if (task().description) {
+    <p class="task-card__description">{{ task().description }}</p>
+  }
+
+  <footer class="task-card__meta">
+    <span class="task-priority">{{ task().priority | titlecase }}</span>
+
+    @if (dueDateLabel) {
+      <span class="task-due">
+        <mat-icon>event</mat-icon>
+        {{ dueDateLabel | date: 'MMM d, y' }}
+      </span>
+    }
+  </footer>
+</article>
