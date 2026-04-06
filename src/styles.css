@@ -27,6 +27,8 @@
   /* Material fallbacks to avoid unresolved outlined-button variables. */
   --mat-button-outlined-label-text-color: var(--brand-700);
   --mat-button-outlined-outline-color: color-mix(in srgb, var(--brand-500) 38%, var(--surface-border));
+  --mat-button-outlined-touch-target-size: 48px;
+  --mat-button-outlined-touch-target-display: block;
 }
 
 body.theme-dark {
@@ -53,6 +55,8 @@ body.theme-dark {
 
   --mat-button-outlined-label-text-color: #bfd4ff;
   --mat-button-outlined-outline-color: color-mix(in srgb, var(--brand-500) 52%, var(--surface-border));
+  --mat-button-outlined-touch-target-size: 48px;
+  --mat-button-outlined-touch-target-display: block;
 }
 
 * {
@@ -134,6 +138,12 @@ mat-progress-bar {
 
 .mat-mdc-outlined-button,
 .mat-mdc-outlined-button:not(:disabled) {
-  --mat-button-outlined-label-text-color: var(--mat-button-outlined-label-text-color, var(--brand-700));
-  --mat-button-outlined-outline-color: var(--mat-button-outlined-outline-color, var(--surface-border));
+  --mat-button-outlined-label-text-color: var(--brand-700);
+  --mat-button-outlined-outline-color: color-mix(in srgb, var(--brand-500) 38%, var(--surface-border));
+}
+
+body.theme-dark .mat-mdc-outlined-button,
+body.theme-dark .mat-mdc-outlined-button:not(:disabled) {
+  --mat-button-outlined-label-text-color: #bfd4ff;
+  --mat-button-outlined-outline-color: color-mix(in srgb, var(--brand-500) 52%, var(--surface-border));
 }
