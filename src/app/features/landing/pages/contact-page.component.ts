@@ -1,4 +1,5 @@
-﻿import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -61,7 +62,22 @@ export class ContactPageComponent {
             message: '',
           });
         },
-        error: () => {
+        error: (error: unknown) => {
+          if (error instanceof HttpErrorResponse && error.status === 0) {
+            this.notification.warn('Contact API is offline. Run `npm run start:api` and try again.');
+            return;
+          }
+
+          if (error instanceof HttpErrorResponse && error.status === 404) {
+            this.notification.warn('Contact endpoint was not found. Ensure API server is running.');
+            return;
+          }
+
+          if (error instanceof HttpErrorResponse && error.status === 500) {
+            this.notification.warn('SMTP send failed. Check SMTP settings in `.env`.');
+            return;
+          }
+
           this.notification.warn('Unable to send your message right now.');
         },
       });
