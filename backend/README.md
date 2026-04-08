@@ -72,3 +72,27 @@ Boards/workspace route is protected in frontend using auth guard.
 - `POST /api/v1/boards/{board_id}/swimlanes`
 - `PATCH /api/v1/swimlanes/{swimlane_id}`
 - `DELETE /api/v1/swimlanes/{swimlane_id}`
+
+## 7) Seed demo users and data
+The project includes a Supabase seeding script:
+- `scripts/seed_supabase.py`
+
+Run all seed users:
+```bash
+python scripts/seed_supabase.py
+```
+
+Run selected seed users only:
+```bash
+python scripts/seed_supabase.py --users product_manager,engineering_lead
+```
+
+Skip reset (append without deleting old rows):
+```bash
+python scripts/seed_supabase.py --skip-reset
+```
+
+Seed user keys:
+- `product_manager`
+- `engineering_lead`
+- `operations_manager`

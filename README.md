@@ -32,6 +32,12 @@ uvicorn app.main:app --reload --port 8000
 Backend docs:
 - `http://localhost:8000/docs`
 
+Seed demo users/workspace data:
+```bash
+cd backend
+python scripts/seed_supabase.py
+```
+
 ## Supabase schema
 Apply SQL schema in:
 - `backend/supabase/schema.sql`
