@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, catchError, map, of, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 import {
   AuthMessageResponse,
   AuthSession,
@@ -11,8 +12,11 @@ import {
   LoginPayload,
   RegisterPayload,
 } from '../models/auth.model';
-import { environment } from '../../environments/environment';
+import { BoardService } from './board.service';
+import { ColumnService } from './column.service';
 import { StorageService } from './storage.service';
+import { SwimlaneService } from './swimlane.service';
+import { TaskService } from './task.service';
 
 const AUTH_SESSION_STORAGE_KEY = 'trackify_auth_session';
 
@@ -23,6 +27,10 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly storage = inject(StorageService);
   private readonly router = inject(Router);
+  private readonly boardService = inject(BoardService);
+  private readonly columnService = inject(ColumnService);
+  private readonly taskService = inject(TaskService);
+  private readonly swimlaneService = inject(SwimlaneService);
 
   private readonly apiBaseUrl = environment.apiBaseUrl;
 
@@ -37,7 +45,10 @@ export class AuthService {
   login(payload: LoginPayload): Observable<AuthSession> {
     return this.http.post<AuthSessionResponse>(`${this.apiBaseUrl}/auth/login`, payload).pipe(
       map((response) => this.mapResponseToSession(response)),
-      tap((session) => this.persistSession(session)),
+      tap((session) => {
+        this.clearWorkspaceCaches();
+        this.persistSession(session);
+      }),
     );
   }
 
@@ -45,6 +56,7 @@ export class AuthService {
     return this.http.post<AuthSessionResponse>(`${this.apiBaseUrl}/auth/register`, payload).pipe(
       tap((response) => {
         if (response.accessToken) {
+          this.clearWorkspaceCaches();
           this.persistSession(this.mapResponseToSession(response));
         }
       }),
@@ -58,6 +70,7 @@ export class AuthService {
   restoreCurrentUser(): Observable<AuthUser | null> {
     const currentSession = this.sessionSubject.value;
     if (!currentSession?.accessToken) {
+      this.clearWorkspaceCaches();
       return of(null);
     }
 
@@ -70,6 +83,7 @@ export class AuthService {
       }),
       catchError(() => {
         this.clearSession();
+        this.clearWorkspaceCaches();
         return of(null);
       }),
     );
@@ -77,6 +91,7 @@ export class AuthService {
 
   logout(redirectToLogin = true): void {
     this.clearSession();
+    this.clearWorkspaceCaches();
 
     if (redirectToLogin) {
       void this.router.navigate(['/auth/login']);
@@ -114,5 +129,12 @@ export class AuthService {
   private clearSession(): void {
     this.sessionSubject.next(null);
     this.storage.removeItem(AUTH_SESSION_STORAGE_KEY);
+  }
+
+  private clearWorkspaceCaches(): void {
+    this.boardService.clearWorkspaceState();
+    this.columnService.clearWorkspaceState();
+    this.taskService.clearWorkspaceState();
+    this.swimlaneService.clearWorkspaceState();
   }
 }

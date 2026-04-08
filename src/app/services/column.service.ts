@@ -1,30 +1,26 @@
-﻿import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { delay, map } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { BehaviorSubject, Observable, forkJoin, map, of, switchMap, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { BoardColumn, CreateColumnPayload } from '../models/column.model';
-import { generateId } from '../shared/utils/id.util';
-import { StorageService } from './storage.service';
 
-const COLUMNS_STORAGE_KEY = 'trackify_columns';
-const API_DELAY_MS = 220;
 const DEFAULT_COLUMN_TITLES = ['To Do', 'In Progress', 'Done'];
 
 @Injectable({
   providedIn: 'root',
 })
 export class ColumnService {
-  private readonly storage = inject(StorageService);
+  private readonly http = inject(HttpClient);
+  private readonly apiBaseUrl = environment.apiBaseUrl;
 
-  private readonly columnsByBoardSubject = new BehaviorSubject<Record<string, BoardColumn[]>>(
-    this.storage.getItem<Record<string, BoardColumn[]>>(COLUMNS_STORAGE_KEY, {}),
-  );
+  private readonly columnsByBoardSubject = new BehaviorSubject<Record<string, BoardColumn[]>>({});
 
   readonly columnsByBoard$ = this.columnsByBoardSubject.asObservable();
 
   getColumnsByBoard(boardId: string): Observable<BoardColumn[]> {
-    return of(null).pipe(
-      delay(API_DELAY_MS),
-      map(() => this.getColumnsSnapshot(boardId)),
+    return this.http.get<BoardColumn[]>(`${this.apiBaseUrl}/boards/${boardId}/columns`).pipe(
+      map((columns) => this.sortByOrder(columns ?? [])),
+      tap((columns) => this.setColumns(boardId, columns)),
     );
   }
 
@@ -33,132 +29,80 @@ export class ColumnService {
   }
 
   createDefaultColumns(boardId: string): Observable<BoardColumn[]> {
-    return of(null).pipe(
-      delay(API_DELAY_MS),
-      map(() => {
-        const existingColumns = this.getColumnsSnapshot(boardId);
+    return this.getColumnsByBoard(boardId).pipe(
+      switchMap((existingColumns) => {
         if (existingColumns.length > 0) {
-          return existingColumns;
+          return of(existingColumns);
         }
 
-        const now = new Date().toISOString();
-        const nextColumns = DEFAULT_COLUMN_TITLES.map((title, index) => ({
-          id: generateId(),
-          boardId,
-          title,
-          order: index,
-          createdAt: now,
-        }));
-
-        this.setColumns(boardId, nextColumns);
-        return nextColumns;
+        return forkJoin(
+          DEFAULT_COLUMN_TITLES.map((title) => this.createColumn({ boardId, title })),
+        ).pipe(map((columns) => this.sortByOrder(columns)));
       }),
     );
   }
 
   createColumn(payload: CreateColumnPayload): Observable<BoardColumn> {
-    return of(null).pipe(
-      delay(API_DELAY_MS),
-      map(() => {
-        const currentColumns = this.getColumnsSnapshot(payload.boardId);
-
-        const column: BoardColumn = {
-          id: generateId(),
-          boardId: payload.boardId,
-          title: payload.title.trim(),
-          order: currentColumns.length,
-          createdAt: new Date().toISOString(),
-        };
-
-        this.setColumns(payload.boardId, [...currentColumns, column]);
-        return column;
-      }),
-    );
+    return this.http
+      .post<BoardColumn>(`${this.apiBaseUrl}/boards/${payload.boardId}/columns`, { title: payload.title })
+      .pipe(
+        tap((column) => {
+          const currentColumns = this.getColumnsSnapshot(payload.boardId);
+          this.setColumns(payload.boardId, [...currentColumns, column]);
+        }),
+      );
   }
 
   renameColumn(boardId: string, columnId: string, title: string): Observable<BoardColumn | null> {
-    return of(null).pipe(
-      delay(API_DELAY_MS),
-      map(() => {
-        const columns = this.getColumnsSnapshot(boardId);
-        let updatedColumn: BoardColumn | null = null;
-
-        const nextColumns = columns.map((column) => {
-          if (column.id !== columnId) {
-            return column;
-          }
-
-          updatedColumn = {
-            ...column,
-            title: title.trim(),
-          };
-
-          return updatedColumn;
-        });
-
+    return this.http.patch<BoardColumn>(`${this.apiBaseUrl}/columns/${columnId}`, { title }).pipe(
+      tap((updatedColumn) => {
+        const nextColumns = this.getColumnsSnapshot(boardId).map((column) =>
+          column.id === columnId ? updatedColumn : column,
+        );
         this.setColumns(boardId, nextColumns);
-        return updatedColumn;
       }),
     );
   }
 
   deleteColumn(boardId: string, columnId: string): Observable<BoardColumn[]> {
-    return of(null).pipe(
-      delay(API_DELAY_MS),
-      map(() => {
-        const nextColumns = this.getColumnsSnapshot(boardId)
-          .filter((column) => column.id !== columnId)
-          .map((column, index) => ({
-            ...column,
-            order: index,
-          }));
-
-        this.setColumns(boardId, nextColumns);
-        return nextColumns;
-      }),
-    );
+    return this.http
+      .delete<BoardColumn[]>(`${this.apiBaseUrl}/boards/${boardId}/columns/${columnId}`)
+      .pipe(
+        map((columns) => this.sortByOrder(columns ?? [])),
+        tap((columns) => this.setColumns(boardId, columns)),
+      );
   }
 
   reorderColumns(boardId: string, orderedColumnIds: string[]): Observable<BoardColumn[]> {
-    return of(null).pipe(
-      delay(API_DELAY_MS),
-      map(() => {
-        const columnById = new Map(
-          this.getColumnsSnapshot(boardId).map((column) => [column.id, column] as const),
-        );
-
-        const reorderedColumns = orderedColumnIds
-          .map((columnId) => columnById.get(columnId))
-          .filter((column): column is BoardColumn => Boolean(column))
-          .map((column, index) => ({
-            ...column,
-            order: index,
-          }));
-
-        this.setColumns(boardId, reorderedColumns);
-        return reorderedColumns;
-      }),
-    );
+    return this.http
+      .post<BoardColumn[]>(`${this.apiBaseUrl}/boards/${boardId}/columns/reorder`, {
+        orderedColumnIds,
+      })
+      .pipe(
+        map((columns) => this.sortByOrder(columns ?? [])),
+        tap((columns) => this.setColumns(boardId, columns)),
+      );
   }
 
   deleteColumnsByBoard(boardId: string): Observable<void> {
-    return of(null).pipe(
-      delay(API_DELAY_MS),
-      map(() => {
+    return of(void 0).pipe(
+      tap(() => {
         const nextState = {
           ...this.columnsByBoardSubject.value,
         };
 
         delete nextState[boardId];
-
         this.columnsByBoardSubject.next(nextState);
-        this.storage.setItem(COLUMNS_STORAGE_KEY, nextState);
       }),
     );
   }
 
   getColumnsSnapshot(boardId: string): BoardColumn[] {
     return this.sortByOrder(this.columnsByBoardSubject.value[boardId] ?? []).map((column) => ({ ...column }));
+  }
+
+  clearWorkspaceState(): void {
+    this.columnsByBoardSubject.next({});
   }
 
   private setColumns(boardId: string, columns: BoardColumn[]): void {
@@ -168,7 +112,6 @@ export class ColumnService {
     };
 
     this.columnsByBoardSubject.next(nextState);
-    this.storage.setItem(COLUMNS_STORAGE_KEY, nextState);
   }
 
   private sortByOrder(columns: BoardColumn[]): BoardColumn[] {

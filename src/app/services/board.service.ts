@@ -1,23 +1,22 @@
-﻿import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { delay, map } from 'rxjs/operators';
+import { HttpErrorResponse, HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { BehaviorSubject, Observable, catchError, map, of, tap, throwError } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { Board, CreateBoardPayload } from '../models/board.model';
-import { generateId } from '../shared/utils/id.util';
 import { StorageService } from './storage.service';
 
-const BOARDS_STORAGE_KEY = 'trackify_boards';
 const LAST_OPENED_BOARD_STORAGE_KEY = 'trackify_last_opened_board';
-const API_DELAY_MS = 260;
 
 @Injectable({
   providedIn: 'root',
 })
 export class BoardService {
+  private readonly http = inject(HttpClient);
   private readonly storage = inject(StorageService);
 
-  private readonly boardsSubject = new BehaviorSubject<Board[]>(
-    this.storage.getItem<Board[]>(BOARDS_STORAGE_KEY, []),
-  );
+  private readonly apiBaseUrl = environment.apiBaseUrl;
+
+  private readonly boardsSubject = new BehaviorSubject<Board[]>([]);
 
   private readonly lastOpenedBoardIdSubject = new BehaviorSubject<string | null>(
     this.storage.getItem<string | null>(LAST_OPENED_BOARD_STORAGE_KEY, null),
@@ -27,74 +26,65 @@ export class BoardService {
   readonly lastOpenedBoardId$ = this.lastOpenedBoardIdSubject.asObservable();
 
   getBoards(): Observable<Board[]> {
-    return of(null).pipe(
-      delay(API_DELAY_MS),
-      map(() => this.getBoardsSnapshot()),
+    return this.http.get<Board[]>(`${this.apiBaseUrl}/boards`).pipe(
+      map((boards) => this.sortBoards(boards ?? [])),
+      tap((boards) => this.boardsSubject.next(boards)),
     );
   }
 
   getBoardById(boardId: string): Observable<Board | null> {
-    return this.boards$.pipe(
-      map((boards) => boards.find((board) => board.id === boardId) ?? null),
+    const cachedBoard = this.boardsSubject.value.find((board) => board.id === boardId);
+    if (cachedBoard) {
+      return of(cachedBoard);
+    }
+
+    return this.http.get<Board>(`${this.apiBaseUrl}/boards/${boardId}`).pipe(
+      tap((board) => this.upsertBoard(board)),
+      catchError((error: unknown) => {
+        if (error instanceof HttpErrorResponse && error.status === 404) {
+          return of(null);
+        }
+
+        return throwError(() => error);
+      }),
     );
   }
 
   createBoard(payload: CreateBoardPayload): Observable<Board> {
-    return of(null).pipe(
-      delay(API_DELAY_MS),
-      map(() => {
-        const board: Board = {
-          id: generateId(),
-          title: payload.title.trim(),
-          description: payload.description.trim(),
-          createdAt: new Date().toISOString(),
-        };
-
-        const nextBoards = [board, ...this.boardsSubject.value];
-        this.persistBoards(nextBoards);
+    return this.http.post<Board>(`${this.apiBaseUrl}/boards`, payload).pipe(
+      tap((board) => {
+        const nextBoards = this.sortBoards([board, ...this.boardsSubject.value]);
+        this.boardsSubject.next(nextBoards);
         this.setLastOpenedBoard(board.id);
-
-        return board;
       }),
     );
   }
 
   updateBoard(boardId: string, payload: CreateBoardPayload): Observable<Board | null> {
-    return of(null).pipe(
-      delay(API_DELAY_MS),
-      map(() => {
-        const boards = this.boardsSubject.value;
-        const boardToUpdate = boards.find((board) => board.id === boardId);
-
-        if (!boardToUpdate) {
-          return null;
+    return this.http.patch<Board>(`${this.apiBaseUrl}/boards/${boardId}`, payload).pipe(
+      tap((updatedBoard) => this.upsertBoard(updatedBoard)),
+      map((board) => board ?? null),
+      catchError((error: unknown) => {
+        if (error instanceof HttpErrorResponse && error.status === 404) {
+          return of(null);
         }
 
-        const updatedBoard: Board = {
-          ...boardToUpdate,
-          title: payload.title.trim(),
-          description: payload.description.trim(),
-        };
-
-        const nextBoards = boards.map((board) => (board.id === boardId ? updatedBoard : board));
-        this.persistBoards(nextBoards);
-        return updatedBoard;
+        return throwError(() => error);
       }),
     );
   }
 
   deleteBoard(boardId: string): Observable<Board[]> {
-    return of(null).pipe(
-      delay(API_DELAY_MS),
+    return this.http.delete<void>(`${this.apiBaseUrl}/boards/${boardId}`).pipe(
       map(() => {
         const nextBoards = this.boardsSubject.value.filter((board) => board.id !== boardId);
-        this.persistBoards(nextBoards);
+        this.boardsSubject.next(nextBoards);
 
         if (this.lastOpenedBoardIdSubject.value === boardId) {
           this.setLastOpenedBoard(nextBoards[0]?.id ?? null);
         }
 
-        return nextBoards;
+        return [...nextBoards];
       }),
     );
   }
@@ -118,8 +108,26 @@ export class BoardService {
     return [...this.boardsSubject.value];
   }
 
-  private persistBoards(boards: Board[]): void {
-    this.boardsSubject.next(boards);
-    this.storage.setItem(BOARDS_STORAGE_KEY, boards);
+  clearWorkspaceState(): void {
+    this.boardsSubject.next([]);
+    this.setLastOpenedBoard(null);
+  }
+
+  private upsertBoard(board: Board): void {
+    const boards = this.boardsSubject.value;
+    const index = boards.findIndex((entry) => entry.id === board.id);
+
+    if (index === -1) {
+      this.boardsSubject.next(this.sortBoards([board, ...boards]));
+      return;
+    }
+
+    const nextBoards = [...boards];
+    nextBoards[index] = board;
+    this.boardsSubject.next(this.sortBoards(nextBoards));
+  }
+
+  private sortBoards(boards: Board[]): Board[] {
+    return [...boards].sort((left, right) => right.createdAt.localeCompare(left.createdAt));
   }
 }

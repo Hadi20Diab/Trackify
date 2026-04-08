@@ -1,33 +1,24 @@
-﻿import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { delay, map } from 'rxjs/operators';
-import {
-  CreateSwimlanePayload,
-  SwimlaneFormPayload,
-  SwimlaneRule,
-} from '../models/swimlane.model';
-import { generateId } from '../shared/utils/id.util';
-import { StorageService } from './storage.service';
-
-const SWIMLANES_STORAGE_KEY = 'trackify_swimlanes';
-const API_DELAY_MS = 220;
+import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { BehaviorSubject, Observable, map, of, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
+import { CreateSwimlanePayload, SwimlaneFormPayload, SwimlaneRule } from '../models/swimlane.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SwimlaneService {
-  private readonly storage = inject(StorageService);
+  private readonly http = inject(HttpClient);
+  private readonly apiBaseUrl = environment.apiBaseUrl;
 
-  private readonly swimlanesByBoardSubject = new BehaviorSubject<Record<string, SwimlaneRule[]>>(
-    this.storage.getItem<Record<string, SwimlaneRule[]>>(SWIMLANES_STORAGE_KEY, {}),
-  );
+  private readonly swimlanesByBoardSubject = new BehaviorSubject<Record<string, SwimlaneRule[]>>({});
 
   readonly swimlanesByBoard$ = this.swimlanesByBoardSubject.asObservable();
 
   getSwimlanesByBoard(boardId: string): Observable<SwimlaneRule[]> {
-    return of(null).pipe(
-      delay(API_DELAY_MS),
-      map(() => this.getSwimlanesSnapshot(boardId)),
+    return this.http.get<SwimlaneRule[]>(`${this.apiBaseUrl}/boards/${boardId}/swimlanes`).pipe(
+      map((swimlanes) => this.sortByCreatedAt(swimlanes ?? [])),
+      tap((swimlanes) => this.persistSwimlanes(boardId, swimlanes)),
     );
   }
 
@@ -38,24 +29,18 @@ export class SwimlaneService {
   }
 
   createSwimlane(payload: CreateSwimlanePayload): Observable<SwimlaneRule> {
-    return of(null).pipe(
-      delay(API_DELAY_MS),
-      map(() => {
-        const swimlane: SwimlaneRule = {
-          id: generateId(),
-          boardId: payload.boardId,
-          name: payload.name.trim(),
-          criteriaType: payload.criteriaType,
-          criteriaValue: payload.criteriaValue,
-          createdAt: new Date().toISOString(),
-        };
-
-        const nextSwimlanes = [...this.getSwimlanesSnapshot(payload.boardId), swimlane];
-        this.persistSwimlanes(payload.boardId, nextSwimlanes);
-
-        return swimlane;
-      }),
-    );
+    return this.http
+      .post<SwimlaneRule>(`${this.apiBaseUrl}/boards/${payload.boardId}/swimlanes`, {
+        name: payload.name,
+        criteriaType: payload.criteriaType,
+        criteriaValue: payload.criteriaValue,
+      })
+      .pipe(
+        tap((swimlane) => {
+          const nextSwimlanes = [...this.getSwimlanesSnapshot(payload.boardId), swimlane];
+          this.persistSwimlanes(payload.boardId, nextSwimlanes);
+        }),
+      );
   }
 
   updateSwimlane(
@@ -63,40 +48,28 @@ export class SwimlaneService {
     swimlaneId: string,
     payload: SwimlaneFormPayload,
   ): Observable<SwimlaneRule | null> {
-    return of(null).pipe(
-      delay(API_DELAY_MS),
-      map(() => {
-        let updatedSwimlane: SwimlaneRule | null = null;
-
-        const nextSwimlanes = this.getSwimlanesSnapshot(boardId).map((swimlane) => {
-          if (swimlane.id !== swimlaneId) {
-            return swimlane;
-          }
-
-          updatedSwimlane = {
-            ...swimlane,
-            name: payload.name.trim(),
-            criteriaType: payload.criteriaType,
-            criteriaValue: payload.criteriaValue,
-          };
-
-          return updatedSwimlane;
-        });
-
-        this.persistSwimlanes(boardId, nextSwimlanes);
-        return updatedSwimlane;
-      }),
-    );
+    return this.http
+      .patch<SwimlaneRule>(`${this.apiBaseUrl}/swimlanes/${swimlaneId}`, {
+        name: payload.name,
+        criteriaType: payload.criteriaType,
+        criteriaValue: payload.criteriaValue,
+      })
+      .pipe(
+        tap((updatedSwimlane) => {
+          const nextSwimlanes = this.getSwimlanesSnapshot(boardId).map((swimlane) =>
+            swimlane.id === swimlaneId ? updatedSwimlane : swimlane,
+          );
+          this.persistSwimlanes(boardId, nextSwimlanes);
+        }),
+      );
   }
 
   deleteSwimlane(boardId: string, swimlaneId: string): Observable<SwimlaneRule[]> {
-    return of(null).pipe(
-      delay(API_DELAY_MS),
+    return this.http.delete<void>(`${this.apiBaseUrl}/swimlanes/${swimlaneId}`).pipe(
       map(() => {
         const nextSwimlanes = this.getSwimlanesSnapshot(boardId).filter(
           (swimlane) => swimlane.id !== swimlaneId,
         );
-
         this.persistSwimlanes(boardId, nextSwimlanes);
         return nextSwimlanes;
       }),
@@ -104,16 +77,14 @@ export class SwimlaneService {
   }
 
   deleteSwimlanesByBoard(boardId: string): Observable<void> {
-    return of(null).pipe(
-      delay(API_DELAY_MS),
-      map(() => {
+    return of(void 0).pipe(
+      tap(() => {
         const nextState = {
           ...this.swimlanesByBoardSubject.value,
         };
 
         delete nextState[boardId];
         this.swimlanesByBoardSubject.next(nextState);
-        this.storage.setItem(SWIMLANES_STORAGE_KEY, nextState);
       }),
     );
   }
@@ -124,6 +95,10 @@ export class SwimlaneService {
     }));
   }
 
+  clearWorkspaceState(): void {
+    this.swimlanesByBoardSubject.next({});
+  }
+
   private persistSwimlanes(boardId: string, swimlanes: SwimlaneRule[]): void {
     const nextState = {
       ...this.swimlanesByBoardSubject.value,
@@ -131,7 +106,6 @@ export class SwimlaneService {
     };
 
     this.swimlanesByBoardSubject.next(nextState);
-    this.storage.setItem(SWIMLANES_STORAGE_KEY, nextState);
   }
 
   private sortByCreatedAt(swimlanes: SwimlaneRule[]): SwimlaneRule[] {
