@@ -1,17 +1,17 @@
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import Any
+from typing import Annotated, Any
 
 from pydantic import field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     project_name: str = "Trackify API"
     environment: str = "development"
     api_v1_prefix: str = "/api/v1"
-    cors_origins: list[str] = ["http://localhost:4200"]
+    cors_origins: Annotated[list[str], NoDecode] = ["http://localhost:4200"]
 
     supabase_url: str
     supabase_service_role_key: str
