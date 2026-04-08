@@ -204,6 +204,68 @@
   background: var(--surface-card);
 }
 
+.sidebar__account {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.account-card {
+  border: 1px solid var(--surface-border);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface-card) 88%, transparent);
+  padding: 0.55rem;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.account-card__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 0.86rem;
+  color: #fff;
+  background: linear-gradient(135deg, var(--brand-500), var(--brand-700));
+  flex-shrink: 0;
+}
+
+.account-card__info {
+  min-width: 0;
+  display: grid;
+  gap: 0.1rem;
+}
+
+.account-card__info strong,
+.account-card__info span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-card__info strong {
+  font-size: 0.83rem;
+  color: var(--text-primary);
+}
+
+.account-card__info span {
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+}
+
+.account-logout {
+  justify-content: flex-start;
+  border-radius: 12px;
+  min-height: 42px;
+  font-weight: 700;
+}
+
+.account-logout__label {
+  transition: opacity 180ms ease;
+}
+
 .theme-btn__label {
   transition: opacity 180ms ease;
 }
@@ -228,6 +290,7 @@
 
 .app-shell--collapsed .brand__copy,
 .app-shell--collapsed .nav-btn__label,
+.app-shell--collapsed .account-logout__label,
 .app-shell--collapsed .theme-btn__label {
   opacity: 0;
   width: 0;
@@ -240,7 +303,19 @@
   display: none;
 }
 
+.app-shell--collapsed .account-card__info {
+  display: none;
+}
+
+.app-shell--collapsed .account-card {
+  width: 48px;
+  height: 48px;
+  justify-content: center;
+  padding: 0;
+}
+
 .app-shell--collapsed .nav-btn,
+.app-shell--collapsed .account-logout,
 .app-shell--collapsed .sidebar__theme button {
   width: 48px;
   min-width: 48px;
@@ -254,6 +329,7 @@
 }
 
 .app-shell--collapsed .nav-btn .mdc-button__label,
+.app-shell--collapsed .account-logout .mdc-button__label,
 .app-shell--collapsed .sidebar__theme button .mdc-button__label {
   width: 100%;
   display: inline-flex;
@@ -262,6 +338,7 @@
 }
 
 .app-shell--collapsed .nav-btn .mat-icon,
+.app-shell--collapsed .account-logout .mat-icon,
 .app-shell--collapsed .sidebar__theme button .mat-icon {
   margin: 0 !important;
 }

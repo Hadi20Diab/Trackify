@@ -63,6 +63,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .public-theme-toggle {
@@ -74,6 +76,14 @@
 
 .public-theme-toggle:hover {
   background: color-mix(in srgb, var(--brand-500) 9%, var(--surface-card));
+}
+
+.public-actions .mat-mdc-outlined-button,
+.public-actions .mat-mdc-unelevated-button {
+  border-radius: 999px;
+  min-height: 42px;
+  padding-inline: 1rem;
+  font-weight: 700;
 }
 
 @media (max-width: 920px) {

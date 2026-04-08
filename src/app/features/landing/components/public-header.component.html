@@ -25,6 +25,14 @@
       <mat-icon>{{ (isDarkMode$ | async) ? 'light_mode' : 'dark_mode' }}</mat-icon>
     </button>
 
-    <a mat-flat-button color="primary" routerLink="/boards">Open Workspace</a>
+    @if (currentUser$ | async; as currentUser) {
+      <a mat-flat-button color="primary" routerLink="/boards">Open Workspace</a>
+      <button mat-stroked-button type="button" (click)="logout()">
+        Sign Out
+      </button>
+    } @else {
+      <a mat-stroked-button routerLink="/auth/login">Sign In</a>
+      <a mat-flat-button color="primary" routerLink="/auth/register">Create Account</a>
+    }
   </div>
 </header>

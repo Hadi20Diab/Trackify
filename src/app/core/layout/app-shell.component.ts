@@ -8,6 +8,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { distinctUntilChanged, map } from 'rxjs';
 import { Board } from '../../models/board.model';
+import { AuthService } from '../../services/auth.service';
 import { BoardService } from '../../services/board.service';
 import { StorageService } from '../../services/storage.service';
 import { ThemeService } from '../../services/theme.service';
@@ -32,6 +33,7 @@ const SIDEBAR_COLLAPSE_STORAGE_KEY = 'trackify_sidebar_collapsed';
 })
 export class AppShellComponent {
   private readonly boardService = inject(BoardService);
+  private readonly authService = inject(AuthService);
   private readonly themeService = inject(ThemeService);
   private readonly storageService = inject(StorageService);
   private readonly breakpointObserver = inject(BreakpointObserver);
@@ -40,6 +42,7 @@ export class AppShellComponent {
   readonly boards$ = this.boardService.boards$;
   readonly lastOpenedBoardId$ = this.boardService.lastOpenedBoardId$;
   readonly isDarkMode$ = this.themeService.isDarkMode$;
+  readonly currentUser$ = this.authService.user$;
   readonly isSidebarCollapsed = signal(
     this.storageService.getItem<boolean>(SIDEBAR_COLLAPSE_STORAGE_KEY, false),
   );
@@ -72,6 +75,10 @@ export class AppShellComponent {
 
   persistOpenedBoard(boardId: string): void {
     this.boardService.setLastOpenedBoard(boardId);
+  }
+
+  logout(): void {
+    this.authService.logout();
   }
 
   trackBoard(_index: number, board: Board): string {

@@ -72,6 +72,31 @@
       </div>
     </section>
 
+    @if (currentUser$ | async; as currentUser) {
+      <section class="sidebar__account">
+        <div class="account-card" [matTooltip]="isSidebarCollapsed() ? currentUser.email : ''">
+          <div class="account-card__avatar">
+            {{ (currentUser.fullName || currentUser.email).charAt(0).toUpperCase() }}
+          </div>
+          <div class="account-card__info">
+            <strong>{{ currentUser.fullName || 'Trackify User' }}</strong>
+            <span>{{ currentUser.email }}</span>
+          </div>
+        </div>
+
+        <button
+          mat-stroked-button
+          type="button"
+          class="account-logout"
+          (click)="logout()"
+          [matTooltip]="isSidebarCollapsed() ? 'Sign out' : ''"
+        >
+          <mat-icon>logout</mat-icon>
+          <span class="account-logout__label">Sign Out</span>
+        </button>
+      </section>
+    }
+
     <section class="sidebar__theme">
       <button
         mat-button

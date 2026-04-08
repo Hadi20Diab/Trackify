@@ -1,4 +1,6 @@
-﻿import { Routes } from '@angular/router';
+import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
+import { guestGuard } from './core/guards/guest.guard';
 import { AppShellComponent } from './core/layout/app-shell.component';
 
 export const routes: Routes = [
@@ -32,8 +34,29 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'auth/login',
+    canActivate: [guestGuard],
+    loadComponent: () =>
+      import('./features/auth/pages/login-page.component').then((module) => module.LoginPageComponent),
+  },
+  {
+    path: 'auth/register',
+    canActivate: [guestGuard],
+    loadComponent: () =>
+      import('./features/auth/pages/register-page.component').then((module) => module.RegisterPageComponent),
+  },
+  {
+    path: 'auth/forgot-password',
+    canActivate: [guestGuard],
+    loadComponent: () =>
+      import('./features/auth/pages/forgot-password-page.component').then(
+        (module) => module.ForgotPasswordPageComponent,
+      ),
+  },
+  {
     path: '',
     component: AppShellComponent,
+    canActivate: [authGuard],
     children: [
       {
         path: 'boards',
